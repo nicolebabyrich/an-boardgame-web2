@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faea98",
+    "id": 1,
+    "title": "Lệ Chi Viên: khi lịch sử trở thành một vụ án",
+    "excerpt": "Từ một biến cố lịch sử, đội ngũ xây dựng cơ chế suy luận nhiều lớp như thế nào?",
+    "image": "/img/products/4.png",
+    "date": "24.06.2026",
+    "status": "PUBLISHED",
+    "source": "ADMIN"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea99",
+    "id": 2,
+    "title": "Năm dấu hiệu của một lời khai chưa hoàn chỉnh",
+    "excerpt": "Quan sát, đối chiếu và giữ một chút hoài nghi trước mọi nhân chứng.",
+    "image": "/img/products/10.png",
+    "date": "18.06.2026",
+    "status": "PUBLISHED",
+    "source": "ADMIN"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea9a",
+    "id": 3,
+    "title": "Thiết kế một bàn chơi đậm chất hồ sơ cổ",
+    "excerpt": "Ánh sáng, nhịp chơi và những vật phẩm nhỏ làm nên trải nghiệm nhập vai.",
+    "image": "/img/products/12.png",
+    "date": "09.06.2026",
+    "status": "DRAFT",
+    "source": "ADMIN"
+  }
+]

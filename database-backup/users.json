@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faea9c",
+    "id": 1,
+    "fullName": "Hoàng Lan",
+    "email": "oanhntkk24411@st.uel.edu.vn",
+    "phone": "0704477397",
+    "passwordHash": "e99dc31328f162f378cfcb197ba43af6e70dc25954257d18e799d0deb8138270",
+    "dateOfBirth": "2003-03-15",
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea9d",
+    "id": 2,
+    "fullName": "Lê Ngọc Mai",
+    "email": "mai.le@example.com",
+    "phone": "0901000002",
+    "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    "dateOfBirth": "2002-08-21",
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea9e",
+    "id": 3,
+    "fullName": "Phạm Gia Huy",
+    "email": "huy.pham@example.com",
+    "phone": "0901000003",
+    "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    "dateOfBirth": "2001-11-09",
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea9f",
+    "id": 4,
+    "fullName": "Võ Thanh Hà",
+    "email": "ha.vo@example.com",
+    "phone": "0901000004",
+    "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    "dateOfBirth": "2003-05-30",
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa0",
+    "id": 5,
+    "fullName": "Đặng Quốc Bảo",
+    "email": "bao.dang@example.com",
+    "phone": "0901000005",
+    "passwordHash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    "dateOfBirth": "2000-12-12",
+    "status": "ACTIVE"
+  }
+]

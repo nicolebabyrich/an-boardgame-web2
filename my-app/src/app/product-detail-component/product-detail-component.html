@@ -1,0 +1,243 @@
+<ng-container *ngIf="product as prod; else notFoundTpl">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs" aria-label="Đường dẫn">
+        <a routerLink="/home">Trang chủ</a><span>/</span>
+        <a routerLink="/products">Sản phẩm</a><span>/</span>
+        <span>{{ prod.name }}</span>
+      </nav>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <article class="product-detail">
+        <div class="product-gallery">
+          <div class="gallery-thumbs" aria-label="Ảnh phụ">
+            <button
+              *ngFor="let image of prod.images; let i = index"
+              class="gallery-thumb"
+              [class.is-active]="i === activeImageIndex"
+              type="button"
+              (click)="selectGalleryImage(i)"
+            >
+              <img [src]="image" [alt]="'Ảnh ' + (i + 1) + ' của ' + prod.name">
+            </button>
+          </div>
+          <div class="gallery-main" [attr.data-gallery-count]="prod.images.length">
+            <button class="gallery-nav gallery-nav--prev" type="button" (click)="prevImage()" aria-label="Ảnh trước">
+              <svg class="bi bi-chevron-left" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"/></svg>
+            </button>
+            <img id="product-main-image" [src]="prod.images[activeImageIndex] || prod.images[0]" [alt]="prod.name">
+            <button class="gallery-nav gallery-nav--next" type="button" (click)="nextImage()" aria-label="Ảnh tiếp theo">
+              <svg class="bi bi-chevron-right" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="product-info">
+          <p class="eyebrow">{{ store.getCategoryName(prod.category) }}</p>
+          <h1>{{ prod.name }}</h1>
+          <span class="status-badge" [ngClass]="store.statusBadgeModifier(prod.status)">
+            {{ store.statusLabel(prod.status) }}
+          </span>
+          <div class="price">
+            <span class="price-current">{{ store.formatCurrency(prod.discountPrice ?? prod.price) }}</span>
+            <span *ngIf="prod.discountPrice" class="price-old">{{ store.formatCurrency(prod.price) }}</span>
+          </div>
+          <p>{{ prod.description }}</p>
+
+          <div class="stock-meter" aria-label="Tình trạng tồn kho">
+            <span class="stock-meter__icon" aria-hidden="true">
+              <svg class="bi bi-box-seam" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8.186 1.113a.5.5 0 0 0-.372 0L1.846 3.5 8 5.961 14.154 3.5z"/><path d="M15 4.239 8.5 6.839v7.922l6.5-2.6z"/><path d="M7.5 14.762V6.838L1 4.239v7.923z"/><path d="M1.245 3.089 7.814.461a.5.5 0 0 1 .372 0l6.569 2.628A.5.5 0 0 1 15 3.554v8.892a.5.5 0 0 1-.314.464l-6.5 2.6a.5.5 0 0 1-.372 0l-6.5-2.6A.5.5 0 0 1 1 12.446V3.554a.5.5 0 0 1 .245-.465"/></svg>
+            </span>
+            <div class="stock-meter__body">
+              <div class="stock-meter__track"><span [style.width.%]="stockPercent"></span></div>
+              <small>{{ stockLabel }} · còn {{ prod.stock }} sản phẩm</small>
+            </div>
+          </div>
+
+          <p class="muted">Tồn kho khả dụng: <strong>{{ prod.stock }}</strong></p>
+
+          <!-- Chọn thuộc tính sản phẩm (Phiên bản / Size) - Right #2 -->
+          <div class="form-field" style="margin:0.75rem 0;">
+            <span class="form-label">Phân loại / Phiên bản <span style="color:#ef4444;">*</span></span>
+            <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.35rem;">
+              <button
+                *ngFor="let attr of availableAttributes"
+                type="button"
+                class="button button--small"
+                [ngClass]="selectedAttribute === attr ? 'button--primary' : 'button--ghost'"
+                (click)="selectedAttribute = attr"
+              >
+                {{ attr }}
+              </button>
+            </div>
+          </div>
+
+          <div class="quantity-control" aria-label="Chọn số lượng">
+            <button type="button" (click)="changeQuantity(-1)" aria-label="Giảm số lượng">-</button>
+            <input id="product-quantity" type="number" min="1" [max]="prod.stock" [(ngModel)]="quantity" aria-label="Số lượng">
+            <button type="button" (click)="changeQuantity(1)" aria-label="Tăng số lượng">+</button>
+          </div>
+
+          <div class="button-row">
+            <button class="button button--primary" type="button" (click)="buyNow()" [disabled]="soldOut">
+              {{ soldOut ? 'Hết hàng' : 'Mua ngay' }}
+            </button>
+            <button class="button button--secondary" type="button" (click)="addToCart()" [disabled]="soldOut">
+              Thêm vào giỏ hàng
+            </button>
+          </div>
+
+          <!-- Ghi chú thân thiện cho khách chưa đăng nhập khi bấm Mua ngay (Bug #24) -->
+          <p *ngIf="!store.getCurrentUser()" class="muted" style="font-size:0.84rem;margin-top:0.5rem;padding:0.55rem 0.75rem;border-left:3px solid #d5b76b;background:rgba(213,183,107,0.08);">
+            💡 <strong>Lưu ý:</strong> CẦN TẠO TÀI KHOẢN (<a routerLink="/register" style="color:var(--gold-soft);text-decoration:underline;">Đăng ký ngay</a> / <a routerLink="/login" style="color:var(--gold-soft);text-decoration:underline;">Đăng nhập</a>) để áp dụng Voucher & lưu lịch sử đơn, hoặc bấm <strong>Mua ngay</strong> để đặt nhanh với tư cách Khách vãng lai (nhận OTP kích hoạt).
+          </p>
+
+          <div class="product-specs">
+            <div class="spec-item"><span>Bối cảnh lịch sử</span><strong>{{ prod.historicalPeriod }}</strong></div>
+            <div class="spec-item"><span>Thể loại</span><strong>{{ prod.gameType }}</strong></div>
+            <div class="spec-item"><span>Số người chơi</span><strong>{{ prod.playerCount }}</strong></div>
+            <div class="spec-item"><span>Độ tuổi</span><strong>{{ prod.ageRating }}</strong></div>
+            <div class="spec-item"><span>Thời lượng</span><strong>{{ prod.duration }}</strong></div>
+            <div class="spec-item"><span>Độ khó</span><strong>{{ prod.difficulty }}</strong></div>
+          </div>
+        </div>
+      </article>
+
+      <section *ngIf="prod.model3d || prod.demoVideo" class="immersive-panel surface" aria-labelledby="immersive-title">
+        <div>
+          <p class="eyebrow">Trải nghiệm bứt phá</p>
+          <h2 id="immersive-title">MÔ HÌNH 3D</h2>
+          <p class="muted">Quan sát sản phẩm 360° từ nhiều góc độ trước khi đặt hàng.</p>
+          <div class="button-row">
+            <button *ngIf="prod.model3d" class="button button--primary" type="button" (click)="open3DModal()">Xem mô hình 3D</button>
+            <a *ngIf="prod.demoVideo" class="button button--secondary" href="#product-demo-video">Xem video demo</a>
+          </div>
+        </div>
+        <div *ngIf="prod.model3d" [innerHTML]="modelViewerPreviewHtml()"></div>
+        <div *ngIf="prod.demoVideo" class="product-demo-video" id="product-demo-video">
+          <video controls preload="metadata" [poster]="prod.images[0]">
+            <source [src]="prod.demoVideo" type="video/mp4">
+            Trình duyệt của bạn chưa hỗ trợ video.
+          </video>
+          <p class="muted">Video demo sản phẩm {{ prod.name }}.</p>
+        </div>
+      </section>
+
+      <div class="detail-copy detail-copy--accordion">
+        <details class="info-disclosure" open>
+          <summary><span>Thành phần trong hộp</span></summary>
+          <p>{{ prod.components }}</p>
+        </details>
+        <details class="info-disclosure" open>
+          <summary><span>Tóm tắt cốt truyện</span></summary>
+          <p>{{ prod.storySummary }}</p>
+        </details>
+        <details class="info-disclosure play-guide-disclosure">
+          <summary><span>Đánh giá và hướng dẫn cách chơi ẨN</span></summary>
+          <div class="play-guide-card">
+            <img src="/img/products/14.png" alt="Minh họa hướng dẫn cách chơi ẨN" loading="lazy">
+            <div>
+              <p>ẨN mang đến một lối chơi độc đáo, kết hợp giữa giải đố, suy luận và nhập vai tương tác. Người chơi cần quan sát chi tiết, đọc lời khai, đối chiếu vật chứng và cùng nhau dựng lại mạch sự kiện.</p>
+              <ol>
+                <li><strong>Nhận vai và đọc hồ sơ:</strong> mỗi người chơi nhận thông tin nhân vật, mục tiêu và giới hạn được tiết lộ.</li>
+                <li><strong>Thu thập vật chứng:</strong> lần lượt mở thẻ manh mối, ghi chú điểm nghi vấn và đặt câu hỏi cho các nhân chứng.</li>
+                <li><strong>Đối chiếu giả thuyết:</strong> nhóm so sánh thời gian, động cơ, lời khai và dấu vết để loại trừ thông tin nhiễu.</li>
+                <li><strong>Kết án:</strong> ở cuối ván, người chơi thống nhất hung thủ, động cơ và chuỗi hành động chính.</li>
+              </ol>
+              <p>Trò chơi phù hợp với nhóm yêu lịch sử, trinh thám và trải nghiệm nhập vai. Với luật học nhanh nhưng nhiều lớp suy luận, ẨN đem lại cảm giác như đang mở một hồ sơ cổ ngay trên bàn chơi.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Lời khai người chơi</p>
+          <h2>Đánh giá sản phẩm</h2>
+          <p>Nhận xét chỉ đến từ khách hàng đã mua sản phẩm.</p>
+        </div>
+      </div>
+      <div *ngIf="reviews.length > 0" class="review-list">
+        <article *ngFor="let review of reviews" class="review-card">
+          <div class="stars" [attr.aria-label]="review.rating + ' trên 5 sao'">{{ starsText(review.rating) }}</div>
+          <p>{{ review.comment }}</p>
+          <small>{{ review.customerName || 'khac****an***' }} · {{ store.formatDate(review.createdAt) }}</small>
+        </article>
+      </div>
+      <div *ngIf="reviews.length === 0" class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Chưa có lời khai</h3>
+          <p class="muted">Hãy là khách hàng đầu tiên đánh giá sản phẩm này.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="relatedProducts.length > 0" class="section">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Cùng ngăn lưu trữ</p>
+          <h2>Sản phẩm liên quan</h2>
+        </div>
+      </div>
+      <div class="product-grid">
+        <article *ngFor="let item of relatedProducts" class="product-card" [attr.data-product-id]="item.id">
+          <a class="product-card__media" [routerLink]="['/products', item.id]" [attr.aria-label]="'Xem ' + item.name">
+            <img [src]="item.images[0]" [alt]="item.name" loading="lazy">
+            <span class="product-card__badge">{{ (item.status === 'OUT_OF_STOCK' || item.stock <= 0) ? 'Hết hàng' : store.getCategoryName(item.category) }}</span>
+          </a>
+          <div class="product-card__body">
+            <span class="product-card__category">{{ store.getCategoryName(item.category) }}</span>
+            <a class="product-card__title" [routerLink]="['/products', item.id]">{{ item.name }}</a>
+            <div class="price">
+              <span class="price-current">{{ store.formatCurrency(item.discountPrice ?? item.price) }}</span>
+              <span *ngIf="item.discountPrice" class="price-old">{{ store.formatCurrency(item.price) }}</span>
+            </div>
+            <div class="product-card__actions" style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <a class="button button--ghost button--small" [routerLink]="['/products', item.id]">Xem chi tiết</a>
+              <button
+                *ngIf="item.status !== 'OUT_OF_STOCK' && item.stock > 0"
+                class="button button--primary button--small"
+                type="button"
+                (click)="buyNow(item.id)"
+              >Mua ngay</button>
+              <button
+                class="button button--secondary button--small button--cart-icon"
+                type="button"
+                (click)="addToCart(item.id, 1)"
+                [disabled]="item.status === 'OUT_OF_STOCK' || item.stock <= 0"
+                [attr.aria-label]="'Thêm ' + item.name + ' vào giỏ'"
+              >
+                <svg class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.49-.402L1.61 2H.5a.5.5 0 0 1-.5-.5M3.14 4l1.25 6h8.22l1.286-6zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #notFoundTpl>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Hồ sơ không tồn tại</h3>
+          <p class="muted">Sản phẩm có thể đã được di chuyển.</p>
+          <a class="button button--primary" routerLink="/products">Về trang sản phẩm</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

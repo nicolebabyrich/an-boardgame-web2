@@ -1,0 +1,67 @@
+<section class="section">
+  <div class="container">
+    <div *ngIf="code" class="empty-state surface">
+      <div>
+        <div class="success-visual" aria-hidden="true">
+          <span class="success-visual__icon">
+            <svg class="bi bi-check-circle" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/><path d="m10.97 4.97-.02.022-3.473 4.425-2.093-2.094a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05"/></svg>
+          </span>
+          <img src="/asset/Asset%202@4x.png?v=20260708" alt="">
+        </div>
+        <p class="eyebrow">{{ isCod ? 'Đặt hàng thành công' : 'Thanh toán thành công' }}</p>
+        <h1>Hồ sơ đã được tiếp nhận</h1>
+        <p>Mã đơn hàng: <strong>{{ code }}</strong> (Giữ chỗ tồn kho 15 phút)</p>
+        <p>Cảm ơn bạn đã tin tưởng và chọn ẨN Store.</p>
+        <p class="muted">{{ isCod ? 'Đơn hàng đang chờ ẨN Store xác nhận và chuẩn bị giao đến bạn.' : 'Thanh toán đã hoàn tất. ẨN Store đang chuẩn bị đơn hàng của bạn.' }}</p>
+
+        <!-- Hộp Email Xác nhận & Kích hoạt tài khoản Khách vãng lai bằng OTP (Right #1, Left #19) -->
+        <div *ngIf="guestEmail && guestOtp" class="surface" style="margin:1.25rem auto;max-width:580px;text-align:left;padding:1.15rem;border:1px solid rgba(213,183,107,0.45);">
+          <p class="eyebrow">📧 Thư xác nhận tự động cho Khách vãng lai</p>
+          <h3 style="margin-bottom:0.4rem;">Tài khoản tạm (Trạng thái: UNACTIVATED) đã được khởi tạo</h3>
+          <p class="muted" style="font-size:0.86rem;margin-bottom:0.65rem;">
+            Hệ thống đã gửi email xác nhận đơn hàng kèm đường dẫn kích hoạt tự động tới <strong>{{ guestEmail }}</strong>. Nếu muốn chuyển thành Tài khoản Thành viên chính thức để quản lý đơn, hãy xác nhận mã OTP 6 số dưới đây:
+          </p>
+          <div style="background:rgba(0,0,0,0.35);padding:0.65rem 0.85rem;border-radius:6px;font-size:0.84rem;margin-bottom:0.75rem;">
+            <div>🔗 <strong>Link tự động tạo TK:</strong> <code>{{ guestLink }}</code></div>
+            <div>🔐 <strong>Mã bảo mật OTP (Demo):</strong> <strong style="color:var(--gold-soft);font-size:1rem;">{{ guestOtp }}</strong></div>
+          </div>
+
+          <div *ngIf="!activationSuccess" class="form-grid" style="margin-top:0.5rem;">
+            <label class="form-field">
+              <span class="form-label">Mã OTP xác nhận <span style="color:#ef4444;">*</span></span>
+              <input class="form-control" [(ngModel)]="otpInput" placeholder="Nhập 6 số OTP">
+            </label>
+            <label class="form-field">
+              <span class="form-label">Đặt mật khẩu mới (Tùy chọn)</span>
+              <input class="form-control" type="password" [(ngModel)]="newPasswordInput" placeholder="Từ 6 ký tự trở lên">
+            </label>
+            <div class="form-field form-field--full">
+              <button class="button button--primary button--small" type="button" (click)="activateGuestAccount()">
+                Kích hoạt tài khoản ngay bằng OTP
+              </button>
+            </div>
+          </div>
+          <p *ngIf="activationMessage" class="form-message" [class.form-message--success]="activationSuccess">
+            {{ activationMessage }}
+          </p>
+        </div>
+
+        <div class="button-row success-actions" style="justify-content:center;">
+          <!-- Nhảy thẳng vào giao diện xem chi tiết ĐH vừa đặt (Right #3) -->
+          <a class="button button--primary" [routerLink]="['/orders', targetOrderId]">Xem chi tiết đơn hàng vừa đặt →</a>
+          <a class="button button--ghost" routerLink="/orders">Danh sách đơn hàng</a>
+          <a class="button button--secondary" routerLink="/products">Tiếp tục mua hàng</a>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!code" class="empty-state">
+      <div>
+        <div class="empty-state__symbol" aria-hidden="true">◇</div>
+        <h3>Chưa có đơn hàng mới</h3>
+        <p class="muted">Thông tin checkout cũ đã được làm trống. Hãy quay lại giỏ hàng để tạo đơn mới.</p>
+        <a class="button button--primary" routerLink="/cart">Về giỏ hàng</a>
+      </div>
+    </div>
+  </div>
+</section>

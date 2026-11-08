@@ -1,0 +1,273 @@
+<section class="chatbot-widget" [class.is-open]="open || quickCartOpen" data-chatbot-widget aria-label="Tiện ích nổi ẨN Store">
+  <!-- CỤM 3 NÚT NỔI GÓC DƯỚI PHẢI: GIỎ HÀNG + CHƠI THỬ GAME MÔ PHỎNG + AI THƯ ĐỒNG -->
+  <div class="floating-dock-actions">
+    <!-- 1. Cục Pop-up Giỏ hàng -->
+    <button
+      class="chatbot-toggle chatbot-toggle--cart"
+      type="button"
+      (click)="toggleQuickCart()"
+      [attr.aria-expanded]="quickCartOpen"
+      title="Xem nhanh Giỏ hàng"
+    >
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.49-.402L1.61 2H.5a.5.5 0 0 1-.5-.5M3.14 4l1.25 6h8.22l1.286-6zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/>
+      </svg>
+      <span class="floating-dock-label">Giỏ hàng</span>
+      <span class="floating-dock-badge">{{ store.getCartCount() }}</span>
+    </button>
+
+    <!-- 2. Cục Pop-up Chơi thử Game Mô phỏng -->
+    <button
+      class="chatbot-toggle chatbot-toggle--game"
+      type="button"
+      (click)="jumpToMiniGame()"
+      title="Chơi thử game mô phỏng phá án Lệ Chi Viên"
+    >
+      <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+      </svg>
+      <span class="floating-dock-label">Phá án thử</span>
+    </button>
+
+    <!-- 3. Cục Pop-up AI Thư Đồng -->
+    <button
+      class="chatbot-toggle chatbot-toggle--ai"
+      type="button"
+      (click)="toggleChatbot()"
+      [attr.aria-expanded]="open"
+      aria-controls="chatbot-panel"
+      title="Mở Trợ lý AI Thư Đồng"
+    >
+      <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M6 12.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5M3 8.062C3 6.76 4.235 5.765 5.53 5.886a26.6 26.6 0 0 0 4.94 0C11.765 5.765 13 6.76 13 8.062v1.157a.93.93 0 0 1-.765.935c-.845.147-2.34.346-4.235.346s-3.39-.2-4.235-.346A.93.93 0 0 1 3 9.219zm4.542-.827a.25.25 0 0 0-.217.068l-.92.9a25 25 0 0 1-1.871-.183.25.25 0 0 0-.068.495c.55.076 1.232.149 2.02.193a.25.25 0 0 0 .189-.071l.754-.736.847 1.71a.25.25 0 0 0 .404.062l.932-.97a25 25 0 0 0 1.922-.188.25.25 0 0 0-.068-.495c-.538.074-1.207.145-1.98.189a.25.25 0 0 0-.166.076l-.754.785-.842-1.7a.25.25 0 0 0-.182-.135"/>
+        <path d="M8.5 1.866a1 1 0 1 0-1 0V3h-2A4.5 4.5 0 0 0 1 7.5V8a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1v1a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-1a1 1 0 0 0 1-1V9a1 1 0 0 0-1-1v-.5A4.5 4.5 0 0 0 10.5 3h-2zM14 7.5V13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.5A3.5 3.5 0 0 1 5.5 4h5A3.5 3.5 0 0 1 14 7.5"/>
+      </svg>
+      <span class="floating-dock-label">AI Thư Đồng</span>
+    </button>
+  </div>
+
+  <!-- POP-UP GIỎ HÀNG NHANH GÓC PHẢI DƯỚI -->
+  <div class="chatbot-panel" *ngIf="quickCartOpen && quickCartSummary as cartSum" style="height:auto !important;max-height:460px !important;">
+    <div class="chatbot-panel__header" style="display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <p class="eyebrow" style="margin:0;font-size:0.65rem;">Túi hành trang Điều tra viên</p>
+        <h2 style="margin:0;font-size:1.25rem;">GIỎ HÀNG ({{ store.getCartCount() }})</h2>
+      </div>
+      <button class="chatbot-panel__close" type="button" (click)="quickCartOpen = false" aria-label="Đóng giỏ hàng nhanh">×</button>
+    </div>
+
+    <div class="chatbot-messages" style="max-height:280px;overflow-y:auto;">
+      <ng-container *ngIf="cartSum.items.length > 0; else emptyQuickCartTpl">
+        <div
+          *ngFor="let item of cartSum.items"
+          style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.55rem;background:rgba(255,255,255,0.04);border:1px solid rgba(213,183,107,0.22);border-radius:8px;margin-bottom:0.45rem;"
+        >
+          <div style="display:flex;align-items:center;gap:0.55rem;min-width:0;">
+            <img [src]="item.product?.images?.[0] || '/img/products/23.png'" alt="" style="width:42px;height:42px;border-radius:6px;object-fit:cover;">
+            <div style="min-width:0;">
+              <strong style="display:block;font-size:0.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.product?.name }}</strong>
+              <small class="muted" style="font-size:0.74rem;">SL: {{ item.quantity }} · {{ store.formatCurrency(((item.product?.discountPrice ?? item.product?.price) || 0) * item.quantity) }}</small>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <ng-template #emptyQuickCartTpl>
+        <p class="muted" style="text-align:center;padding:1.25rem 0;margin:0;">Giỏ hàng của bạn đang trống.</p>
+      </ng-template>
+    </div>
+
+    <div style="padding:0.85rem 1rem;border-top:1px solid rgba(234,214,166,0.18);background:rgba(24,9,8,0.95);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.65rem;font-size:0.9rem;">
+        <span>Tạm tính:</span>
+        <strong style="color:var(--color-gold-soft);font-size:1.05rem;">{{ store.formatCurrency(cartSum.subtotal) }}</strong>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <a class="button button--secondary button--small" routerLink="/cart" (click)="quickCartOpen = false" style="justify-content:center;">Xem Giỏ hàng</a>
+        <a class="button button--primary button--small" routerLink="/checkout" (click)="quickCartOpen = false" style="justify-content:center;">Thanh toán</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-panel" id="chatbot-panel" [hidden]="!open">
+    <div class="chatbot-panel__header" style="flex-direction:column;align-items:stretch;gap:0.5rem;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;">
+        <div style="min-width:0;">
+          <p class="eyebrow" style="margin:0 0 0.15rem 0;font-size:0.64rem;letter-spacing:0.06em;white-space:nowrap;line-height:1.2;">{{ advisorMode ? 'Đang kết nối Tư vấn viên' : 'Trợ lý AI & Gợi ý Boardgame' }}</p>
+          <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+            <h2 style="margin:0;font-size:1.38rem;line-height:1.15;white-space:nowrap;">THƯ ĐỒNG</h2>
+            <span
+              *ngIf="advisorMode"
+              style="font-size:0.68rem;padding:0.15rem 0.45rem;border-radius:999px;background:rgba(213,183,107,0.2);color:var(--color-gold-soft);border:1px solid rgba(213,183,107,0.45);font-weight:700;white-space:nowrap;"
+            >Tư vấn viên</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.35rem;align-items:center;flex-shrink:0;">
+          <button
+            class="button button--secondary button--small"
+            style="padding:0.28rem 0.58rem;font-size:0.73rem;white-space:nowrap;"
+            type="button"
+            (click)="showProductFilterPopup = !showProductFilterPopup"
+          >
+            Lọc SP
+          </button>
+          <button
+            class="button button--ghost button--small"
+            style="padding:0.28rem 0.58rem;font-size:0.73rem;white-space:nowrap;"
+            type="button"
+            (click)="switchToAdvisor()"
+          >
+            Tư vấn viên
+          </button>
+          <button class="chatbot-panel__close" type="button" (click)="toggleChatbot()" aria-label="Đóng trợ lý" style="flex-shrink:0;">×</button>
+        </div>
+      </div>
+
+      <!-- Thanh hiển thị Trạng thái cảm xúc KH cho Tư vấn viên theo màu Xanh / Cam / Đỏ -->
+      <div
+        style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.3rem 0.6rem;border-radius:6px;background:rgba(0,0,0,0.42);font-size:0.74rem;"
+        [style.borderLeft]="'4px solid ' + emotionColor"
+      >
+        <span style="display:inline-flex;align-items:center;gap:0.35rem;white-space:nowrap;">
+          <span [style.background]="emotionColor" style="width:8px;height:8px;border-radius:50%;display:inline-block;"></span>
+          <strong>Cảm xúc khách hàng:</strong>
+        </span>
+        <span [style.color]="emotionColor" style="font-weight:700;text-align:right;white-space:nowrap;">{{ emotionLabel }}</span>
+      </div>
+    </div>
+
+    <!-- POP-UP BỘ LỌC SẢN PHẨM THEO THUỘC TÍNH TRONG CHATBOT (Right #7) -->
+    <div
+      *ngIf="showProductFilterPopup"
+      style="padding:0.75rem;background:rgba(28,18,14,0.96);border-bottom:1px solid rgba(213,183,107,0.3);max-height:240px;overflow-y:auto;"
+    >
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.45rem;">
+        <strong style="font-size:0.82rem;color:var(--gold-soft);">🎯 Tìm nhanh Board Game theo thuộc tính:</strong>
+        <button type="button" class="button button--ghost button--small" style="padding:0.1rem 0.45rem;font-size:0.72rem;" (click)="showProductFilterPopup = false">Đóng</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.45rem;margin-bottom:0.55rem;">
+        <select class="form-control" style="padding:0.25rem 0.45rem;font-size:0.78rem;" [(ngModel)]="selectedCatFilter">
+          <option value="ALL">Tất cả danh mục</option>
+          <option value="boardgame">BoardGame</option>
+          <option value="combo">Combo</option>
+          <option value="accessory">Phụ kiện</option>
+          <option value="merchandise">Merchandise</option>
+        </select>
+        <select class="form-control" style="padding:0.25rem 0.45rem;font-size:0.78rem;" [(ngModel)]="selectedDiffFilter">
+          <option value="ALL">Mọi độ khó</option>
+          <option value="Dễ">Dễ (Tân thủ)</option>
+          <option value="Trung bình">Trung bình</option>
+          <option value="Khó">Khó (Suy luận sâu)</option>
+        </select>
+      </div>
+      <div style="display:grid;gap:0.4rem;">
+        <div
+          *ngFor="let item of filteredPopupProducts"
+          style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.35rem 0.5rem;background:rgba(255,255,255,0.04);border-radius:6px;font-size:0.78rem;"
+        >
+          <div style="display:flex;align-items:center;gap:0.45rem;min-width:0;">
+            <img [src]="item.image" alt="" style="width:34px;height:34px;object-fit:cover;border-radius:4px;">
+            <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              <strong style="display:block;overflow:hidden;text-overflow:ellipsis;">{{ item.name }}</strong>
+              <small class="muted">{{ store.formatCurrency(item.price) }} · {{ item.difficulty || 'Mọi cấp' }}</small>
+            </div>
+          </div>
+          <div style="display:flex;gap:0.25rem;flex-shrink:0;">
+            <button type="button" class="button button--ghost button--small" style="padding:0.2rem 0.45rem;font-size:0.72rem;" (click)="viewProductFromChat(item.id)">Xem</button>
+            <button type="button" class="button button--primary button--small" style="padding:0.2rem 0.45rem;font-size:0.72rem;" (click)="buyProductFromChat(item.id)">Mua</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chatbot-messages" #messagesList data-chatbot-messages aria-live="polite">
+      <!-- Gợi ý câu hỏi nhanh theo thuộc tính & Khiếu nại -->
+      <div style="display:flex;gap:0.35rem;flex-wrap:wrap;margin-bottom:0.5rem;">
+        <button
+          *ngFor="let chip of quickPrompts"
+          type="button"
+          class="button button--ghost button--small"
+          style="padding:0.22rem 0.5rem;font-size:0.72rem;text-align:left;"
+          (click)="sendQuickPrompt(chip.query)"
+        >
+          {{ chip.label }}
+        </button>
+      </div>
+
+      <div
+        *ngFor="let msg of messages"
+        class="chatbot-message"
+        [ngClass]="msg.role === 'user' ? 'chatbot-message--user' : 'chatbot-message--bot'"
+      >
+        <div class="chatbot-bubble" *ngIf="msg.role === 'user'">{{ msg.text }}</div>
+        <div class="chatbot-bubble" *ngIf="msg.role !== 'user'">
+          <div [innerHTML]="formatBotReply(msg.text)"></div>
+
+          <!-- Pop-up thẻ sản phẩm liên quan ngay trong câu trả lời của Chatbot (Right #7) -->
+          <div *ngIf="msg.recommendedProducts && msg.recommendedProducts.length > 0" style="margin-top:0.65rem;display:grid;gap:0.45rem;">
+            <small style="color:var(--gold-soft);font-weight:700;">📦 Sản phẩm gợi ý phù hợp thuộc tính:</small>
+            <div
+              *ngFor="let prod of msg.recommendedProducts"
+              style="display:flex;align-items:center;justify-content:space-between;gap:0.45rem;padding:0.4rem;background:rgba(0,0,0,0.35);border:1px solid rgba(213,183,107,0.25);border-radius:6px;"
+            >
+              <div style="display:flex;align-items:center;gap:0.45rem;min-width:0;">
+                <img [src]="prod.image || '/img/products/23.png'" alt="" style="width:36px;height:36px;object-fit:cover;border-radius:4px;">
+                <div style="font-size:0.76rem;min-width:0;">
+                  <strong style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ prod.name }}</strong>
+                  <span style="color:var(--gold-soft);">{{ store.formatCurrency(prod.price) }}</span>
+                  <span class="muted" *ngIf="prod.difficulty"> · {{ prod.difficulty }}</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:0.25rem;flex-shrink:0;">
+                <button type="button" class="button button--ghost button--small" style="padding:0.2rem 0.45rem;font-size:0.7rem;" (click)="viewProductFromChat(prod.id)">Xem</button>
+                <button type="button" class="button button--primary button--small" style="padding:0.2rem 0.45rem;font-size:0.7rem;" (click)="buyProductFromChat(prod.id)">Mua</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POP-UP XOA DỊU & XÁC NHẬN CHUYỂN NGỮ NGAY TRONG LUỒNG CHAT KHI KHÁCH BỰC BỘI -->
+      <div
+        *ngIf="soothingPopup as popup"
+        style="margin-top:0.35rem;padding:0.8rem;border-radius:10px;background:linear-gradient(135deg, rgba(127,29,29,0.55), rgba(45,14,18,0.95));border:1.5px solid #f59e0b;font-size:0.81rem;box-shadow:0 8px 20px rgba(0,0,0,0.45);"
+      >
+        <strong style="color:#fcd34d;display:block;margin-bottom:0.3rem;font-size:0.86rem;">🕊️ {{ popup.title }}</strong>
+        <p style="margin:0 0 0.45rem 0;color:#fef3c7;line-height:1.45;">{{ popup.calmingText }}</p>
+        <div style="background:rgba(0,0,0,0.5);padding:0.5rem 0.65rem;border-radius:6px;margin-bottom:0.5rem;border-left:3px solid #22c55e;">
+          <div class="muted" style="font-size:0.75rem;">Tin nhắn gốc: <s>"{{ popup.originalText }}"</s></div>
+          <div style="color:#86efac;margin-top:0.25rem;line-height:1.4;">↳ <strong>Chuyển ngữ lịch sự:</strong> "{{ popup.softenedText }}"</div>
+        </div>
+        <p style="margin:0 0 0.5rem 0;font-weight:700;color:#fff;">❓ {{ popup.confirmQuestion }}</p>
+        <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+          <button type="button" class="button button--primary button--small" style="padding:0.32rem 0.7rem;font-size:0.76rem;" (click)="confirmSoothingTranslation()">
+            ✓ Đúng ý tôi, gửi Tư vấn viên
+          </button>
+          <button type="button" class="button button--ghost button--small" style="padding:0.32rem 0.7rem;font-size:0.76rem;" (click)="dismissSoothingPopup()">
+            Để tôi nhập lại
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="chatbot-message chatbot-message--bot">
+        <div class="chatbot-bubble">Thư Đồng đang tra cứu hồ sơ...</div>
+      </div>
+    </div>
+
+    <form class="chatbot-form" id="chatbot-form" (ngSubmit)="sendMessage()">
+      <label class="visually-hidden" for="chatbot-message">Nhập câu hỏi</label>
+      <textarea
+        id="chatbot-message"
+        name="message"
+        rows="1"
+        maxlength="700"
+        placeholder="Hỏi thuộc tính board game, tư vấn chọn game hoặc khiếu nại..."
+        [(ngModel)]="inputText"
+        [disabled]="loading"
+        (keydown.enter)="$event.preventDefault(); sendMessage()"
+        required
+      ></textarea>
+      <button class="button button--primary button--small" type="submit" [disabled]="loading">Gửi</button>
+    </form>
+    <p class="chatbot-note">Thư Đồng tích hợp lọc thuộc tính Board Game, tự động xoa dịu chuyển ngữ & đo cảm xúc (Xanh/Cam/Đỏ) cho Tư vấn viên.</p>
+  </div>
+</section>

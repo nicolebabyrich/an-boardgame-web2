@@ -1,0 +1,1770 @@
+<div class="admin-shell" *ngIf="store.isAdminLoggedIn()">
+  <aside class="admin-sidebar">
+    <a class="brand" href="/home" target="_blank" rel="noopener" title="Mở cửa hàng ở tab mới">
+      <span class="brand-mark">
+        <img src="/asset/Asset%202@4x.png?v=20260708" alt="Logo ẨN Store">
+      </span>
+      <span class="brand-copy">
+        <strong class="brand-name">ẨN ADMIN</strong>
+      </span>
+    </a>
+    <nav class="admin-nav" aria-label="Quản trị">
+      <button
+        *ngFor="let tab of adminTabs"
+        [class.is-active]="activeTab === tab[0]"
+        type="button"
+        (click)="switchTab(tab[0])"
+      >
+        {{ tab[1] }}
+      </button>
+    </nav>
+    <div class="button-row">
+      <button class="button button--danger button--small" type="button" (click)="logoutAdmin()">Đăng xuất</button>
+    </div>
+  </aside>
+
+  <main class="admin-main" id="main-content">
+    <header class="admin-header">
+      <div>
+        <p class="eyebrow">ẨN Store</p>
+        <h1>{{ activeTabLabel }}</h1>
+      </div>
+      <!-- Mở cửa hàng sang tab mới theo đúng chuẩn HTML target="_blank" thầy dạy (Bug #22) -->
+      <a class="button button--secondary button--small" href="/home" target="_blank" rel="noopener">
+        Xem cửa hàng
+      </a>
+    </header>
+
+    <p class="form-message" [class.form-message--success]="adminSuccess" id="admin-message">{{ adminMessage }}</p>
+
+    <!-- ==================== TAB 1: DASHBOARD ==================== -->
+    <section class="admin-dashboard-v2" *ngIf="activeTab === 'dashboard' && dashboardStats as stats">
+      <div class="dashboard-kpi-strip">
+        <article class="surface dashboard-kpi-card">
+          <span>Doanh thu</span>
+          <strong>{{ store.formatCurrency(stats.revenue) }}</strong>
+          <small>Đơn đã thanh toán/đã giao</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Tổng đơn</span>
+          <strong>{{ stats.totalOrders }}</strong>
+          <small>{{ stats.pendingOrders }} đơn chờ xác nhận</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Giá trị TB/đơn</span>
+          <strong>{{ store.formatCurrency(stats.averageOrder) }}</strong>
+          <small>AOV theo đơn ghi nhận</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Tỷ lệ hoàn tất</span>
+          <strong>{{ stats.completionRate }}%</strong>
+          <small>{{ stats.completedOrders }}/{{ stats.totalOrders }} đơn đã giao</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Tồn kho thấp</span>
+          <strong>{{ stats.lowStock }}</strong>
+          <small>Cần kiểm tra nhập kho</small>
+        </article>
+      </div>
+
+      <div class="dashboard-main-grid">
+        <article class="surface dashboard-panel dashboard-panel--wide">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Xu hướng</p>
+              <h2>Đơn hàng & doanh thu</h2>
+            </div>
+            <span class="dashboard-note">Theo ngày phát sinh</span>
+          </div>
+          <div class="dashboard-trend-chart">
+            <div class="trend-column" *ngFor="let row of stats.trendRows">
+              <div class="trend-bars">
+                <i
+                  class="trend-bar trend-bar--orders"
+                  [style.height.%]="Math.max(8, Math.round(row.orders / stats.maxTrendOrders * 100))"
+                  [attr.data-tooltip]="row.orders + ' đơn'"
+                  tabindex="0"
+                ></i>
+                <i
+                  class="trend-bar trend-bar--revenue"
+                  [style.height.%]="Math.max(8, Math.round(row.revenue / stats.maxTrendRevenue * 100))"
+                  [attr.data-tooltip]="store.formatCurrency(row.revenue)"
+                  tabindex="0"
+                ></i>
+              </div>
+              <strong>{{ row.orders }}</strong>
+              <span>{{ row.label }}</span>
+            </div>
+          </div>
+          <div class="dashboard-legend">
+            <span><i class="legend-dot legend-dot--orders"></i>Số đơn</span>
+            <span><i class="legend-dot legend-dot--revenue"></i>Doanh thu</span>
+          </div>
+        </article>
+
+        <article class="surface dashboard-panel dashboard-panel--status">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Vận hành</p>
+              <h2>Trạng thái đơn</h2>
+            </div>
+          </div>
+          <div class="dashboard-donut-wrap">
+            <div
+              class="dashboard-donut"
+              [style.--donut]="stats.donutGradient"
+              tabindex="0"
+              aria-label="Xem số lượng đơn theo trạng thái"
+            >
+              <span>{{ stats.totalOrders }}</span>
+              <small>Tổng đơn</small>
+              <div class="dashboard-donut-tooltip" role="tooltip">
+                <p *ngFor="let item of stats.statusCounts">
+                  <i [style.background]="item.color"></i>
+                  <span>{{ item.label }}</span>
+                  <strong>{{ item.count }}</strong>
+                </p>
+              </div>
+            </div>
+            <div class="dashboard-status-list">
+              <div *ngFor="let item of stats.statusCounts">
+                <i [style.background]="item.color"></i>
+                <span>{{ item.label }}</span>
+                <strong>{{ item.count }}</strong>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dashboard-main-grid dashboard-main-grid--equal">
+        <article class="surface dashboard-panel">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Danh mục</p>
+              <h2>Doanh thu theo danh mục</h2>
+            </div>
+          </div>
+          <div class="category-revenue-chart">
+            <div class="category-revenue-row" *ngFor="let row of stats.categoryRows">
+              <span>{{ row.category.name }}</span>
+              <div>
+                <i
+                  [style.width.%]="row.sales ? Math.max(8, Math.round(row.sales / stats.maxCategorySales * 100)) : 0"
+                  [attr.data-tooltip]="store.formatCurrency(row.sales)"
+                  tabindex="0"
+                ></i>
+              </div>
+              <strong>{{ store.formatCurrency(row.sales) }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="surface dashboard-panel">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Sản phẩm</p>
+              <h2>Top sản phẩm bán chạy</h2>
+            </div>
+          </div>
+          <div class="top-products-chart">
+            <div class="top-product-row" *ngFor="let row of stats.productRows; let i = index">
+              <span>{{ i + 1 }}</span>
+              <div>
+                <strong>{{ row.product.name }}</strong>
+                <i
+                  [style.width.%]="row.sold ? Math.max(8, Math.round(row.sold / stats.maxSold * 100)) : 0"
+                  [attr.data-tooltip]="row.sold + ' đã bán'"
+                  tabindex="0"
+                ></i>
+              </div>
+              <b>{{ row.sold }}</b>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="dashboard-main-grid dashboard-main-grid--equal">
+        <article class="surface dashboard-panel dashboard-alert-panel">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Cảnh báo</p>
+              <h2>Cảnh báo vận hành</h2>
+            </div>
+          </div>
+          <div class="operation-alert-grid">
+            <a [routerLink]="['/admin']" [queryParams]="{ tab: 'orders' }">
+              <strong>{{ stats.pendingOrders }}</strong>
+              <span>Đơn chờ xác nhận</span>
+            </a>
+            <a [routerLink]="['/admin']" [queryParams]="{ tab: 'inventory' }">
+              <strong>{{ stats.lowStock }}</strong>
+              <span>Sản phẩm tồn kho thấp</span>
+            </a>
+            <a [routerLink]="['/admin']" [queryParams]="{ tab: 'returns' }">
+              <strong>{{ stats.pendingReturns }}</strong>
+              <span>Yêu cầu đổi/trả</span>
+            </a>
+            <a [routerLink]="['/admin']" [queryParams]="{ tab: 'blogs' }">
+              <strong>{{ stats.pendingBlogs }}</strong>
+              <span>Blog user chờ duyệt</span>
+            </a>
+          </div>
+        </article>
+
+        <article class="surface dashboard-panel">
+          <div class="dashboard-panel__head">
+            <div>
+              <p class="eyebrow">Chất lượng</p>
+              <h2>Review & rating</h2>
+            </div>
+          </div>
+          <div class="review-summary-grid">
+            <div><strong>{{ stats.averageRating }}★</strong><span>Rating trung bình</span></div>
+            <div><strong>{{ stats.totalReviews }}</strong><span>Tổng đánh giá</span></div>
+            <div><strong>{{ stats.visibleReviews }}</strong><span>Đang hiển thị</span></div>
+          </div>
+          <p class="muted dashboard-review-note">Dùng để đối chiếu nhanh giữa chất lượng cảm nhận và nhóm sản phẩm đang bán tốt.</p>
+        </article>
+      </div>
+
+      <section class="section section--compact dashboard-recent-orders">
+        <h2>Đơn hàng gần đây</h2>
+        <div class="table-wrap">
+          <table class="data-table admin-orders-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Ngày</th>
+                <th>Tổng</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of orders.slice(0, 5)">
+                <td>
+                  <a class="admin-order-code" [routerLink]="['/admin']" [queryParams]="{ tab: 'orders', orderId: order.id }">
+                    {{ order.code }}
+                  </a>
+                  <small class="admin-request-note" *ngIf="order.cancellationRequest?.status === 'PENDING'">
+                    Yêu cầu hủy: {{ order.cancellationRequest?.reason }}
+                  </small>
+                </td>
+                <td>{{ store.formatDate(order.createdAt) }}</td>
+                <td>{{ store.formatCurrency(order.total) }}</td>
+                <td>{{ adminPaymentLabel(order) }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="store.statusBadgeModifier(order.status)">
+                    {{ store.statusLabel(order.status) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <!-- ==================== TAB 2: PRODUCTS ==================== -->
+    <ng-container *ngIf="activeTab === 'products'">
+      <section class="surface account-panel">
+        <h2>Thêm hoặc sửa sản phẩm</h2>
+        <form id="admin-product-form" class="form-grid" (ngSubmit)="onSubmitProduct()">
+          <label class="form-field form-field--full">
+            <span class="form-label">Tên sản phẩm</span>
+            <input class="form-control" name="name" required [(ngModel)]="productForm.name">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Danh mục</span>
+            <select class="form-control" name="category" [(ngModel)]="productForm.category">
+              <option *ngFor="let cat of realCategories" [value]="cat.id">{{ cat.name }}</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span class="form-label">Import hình sản phẩm</span>
+            <input class="form-control" type="file" name="imageFile" accept="image/*" (change)="onProductImageChange($event)">
+            <small class="muted">Demo sẽ lấy tên file và map về thư mục /img/products/.</small>
+          </label>
+          <label class="form-field">
+            <span class="form-label">Giá</span>
+            <input class="form-control" type="number" name="price" min="0" required [(ngModel)]="productForm.price">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Giá giảm</span>
+            <input class="form-control" type="number" name="discountPrice" min="0" [(ngModel)]="productForm.discountPrice">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Tồn kho</span>
+            <input class="form-control" type="number" name="stock" min="0" required [(ngModel)]="productForm.stock">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Bối cảnh</span>
+            <input class="form-control" name="historicalPeriod" [(ngModel)]="productForm.historicalPeriod">
+          </label>
+          <label class="form-field form-field--full">
+            <span class="form-label">Mô tả</span>
+            <textarea class="form-control" name="description" [(ngModel)]="productForm.description"></textarea>
+          </label>
+          <div class="button-row">
+            <button class="button button--primary" type="submit">Lưu sản phẩm</button>
+            <button class="button button--ghost" type="button" (click)="resetProductForm()">Làm mới</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section section--compact" id="admin-product-list-section">
+        <div class="admin-toolbar surface">
+          <label class="form-field">
+            <span class="form-label">Lọc danh mục</span>
+            <select
+              class="form-control"
+              id="admin-product-category-filter"
+              [ngModel]="categoryFilter"
+              (ngModelChange)="onProductCategoryFilterChange($event)"
+            >
+              <option value="all">Tất cả sản phẩm</option>
+              <option *ngFor="let cat of realCategories" [value]="cat.id">{{ cat.name }}</option>
+            </select>
+          </label>
+          <button
+            class="button button--danger button--small admin-bulk-delete"
+            [class.is-hidden]="selectedProductIds.size === 0"
+            type="button"
+            (click)="deleteSelectedProducts()"
+          >
+            🗑 Xóa sản phẩm đã chọn
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    type="checkbox"
+                    id="admin-select-all-products"
+                    aria-label="Chọn tất cả sản phẩm"
+                    (change)="toggleSelectAllProducts($any($event.target).checked)"
+                  >
+                </th>
+                <th>Sản phẩm</th>
+                <th>Giá</th>
+                <th>Kho</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of filteredProducts">
+                <td>
+                  <input
+                    type="checkbox"
+                    [checked]="isProductChecked(product.id)"
+                    (change)="toggleProductCheck(product.id, $any($event.target).checked)"
+                  >
+                </td>
+                <td>
+                  <span class="table-product">
+                    <img [src]="product.images[0]" alt="">
+                    <strong>{{ product.name }}</strong>
+                  </span>
+                </td>
+                <td>{{ store.formatCurrency(product.discountPrice ?? product.price) }}</td>
+                <td [class.low-stock]="product.stock <= 5">{{ product.stock }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="store.statusBadgeModifier(product.status)">
+                    {{ store.statusLabel(product.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="button-row">
+                    <button class="button button--ghost button--small" type="button" (click)="editProduct(product)">Sửa</button>
+                    <button class="button button--secondary button--small" type="button" (click)="toggleProduct(product.id)">
+                      {{ product.status === 'HIDDEN' ? 'Hiện' : 'Ẩn' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- ==================== TAB 3: CATEGORIES ==================== -->
+    <ng-container *ngIf="activeTab === 'categories'">
+      <section class="surface account-panel">
+        <h2>Quản lý danh mục</h2>
+        <form id="admin-category-form" class="form-grid" (ngSubmit)="onSubmitCategory()">
+          <label class="form-field">
+            <span class="form-label">Tên danh mục</span>
+            <input class="form-control" name="name" required [(ngModel)]="categoryForm.name">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Mô tả</span>
+            <input class="form-control" name="description" [(ngModel)]="categoryForm.description">
+          </label>
+          <div class="button-row form-field--full">
+            <button class="button button--primary" type="submit">Thêm danh mục</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section section--compact">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tên</th>
+                <th>Mô tả</th>
+                <th>Số SP</th>
+                <th>Trạng thái</th>
+                <th>Chi tiết sản phẩm</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let category of realCategories">
+                <td><strong>{{ category.name }}</strong></td>
+                <td>{{ category.description }}</td>
+                <td>{{ countProductsInCategory(category.id) }}</td>
+                <td>{{ category.hidden ? 'Đang ẩn' : 'Đang hiển thị' }}</td>
+                <td>
+                  <button class="button button--secondary button--small" type="button" (click)="viewProductsFromCategory(category.id)">
+                    Xem sản phẩm
+                  </button>
+                </td>
+                <td>
+                  <button class="button button--ghost button--small" type="button" (click)="toggleCategory(category.id)">
+                    {{ category.hidden ? 'Hiện' : 'Ẩn' }}
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- ==================== TAB 4: HỆ THỐNG QUẢN TRỊ KHO WMS KHOA HỌC (5 PILLARS) ==================== -->
+    <ng-container *ngIf="activeTab === 'inventory' && inventoryKpiSummary as kpi">
+      <!-- 6. BÁO CÁO TỒN KHO CHI TIẾT & ĐỒNG BỘ REALTIME -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.1rem;">
+        <div style="display:flex;align-items:center;gap:0.65rem;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.32rem 0.75rem;border-radius:999px;background:rgba(34,197,94,0.14);border:1px solid rgba(34,197,94,0.45);color:#86efac;font-size:0.8rem;font-weight:700;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;"></span>
+            Đồng bộ Realtime · {{ lastRealtimeSyncAt }}
+          </span>
+          <span class="muted" style="font-size:0.86rem;">
+            Tự động khấu trừ / hoàn trả khi phát sinh đơn hàng, hủy đơn, đổi trả hoặc phiếu kiểm kê.
+          </span>
+        </div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <button type="button" class="button button--ghost button--small" (click)="refreshInventoryRealtime()">
+            ↻ Cập nhật Realtime
+          </button>
+          <button type="button" class="button button--secondary button--small" (click)="exportInventoryCsv()">
+            ⬇ Xuất báo cáo Nhập - Xuất - Tồn (.CSV)
+          </button>
+          <button type="button" class="button button--primary button--small" (click)="inventorySubTab = 'receipt'">
+            + Lập phiếu Nhập / Xuất kho
+          </button>
+        </div>
+      </div>
+
+      <!-- DẢI CHỈ SỐ KPI BÁO CÁO TỒN KHO REALTIME -->
+      <div class="dashboard-kpi-strip" style="margin-bottom:1.25rem;">
+        <article class="surface dashboard-kpi-card">
+          <span>Tổng giá trị tồn kho</span>
+          <strong style="color:var(--color-gold-soft);">{{ store.formatCurrency(kpi.totalInventoryValue) }}</strong>
+          <small>{{ kpi.totalSkus }} danh mục SKU đang quản lý</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Tồn thực tế / Khả dụng</span>
+          <strong>{{ kpi.totalPhysicalUnits }} <small style="font-size:0.9rem;color:#86efac;">({{ kpi.totalAvailableUnits }} khả dụng)</small></strong>
+          <small>Đang giữ chỗ đơn chờ: {{ kpi.totalReservedUnits }} đv</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Tổng Nhập / Xuất lũy kế</span>
+          <strong>
+            <span style="color:#86efac;">+{{ kpi.totalInboundUnits }}</span>
+            <span class="muted"> / </span>
+            <span style="color:#fca5a5;">-{{ kpi.totalOutboundUnits }}</span>
+          </strong>
+          <small>{{ transactions.length }} chứng từ ghi nhận</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Cảnh báo định mức tối thiểu</span>
+          <strong [style.color]="(kpi.lowStockCount + kpi.outOfStockCount) > 0 ? '#fbbf24' : '#86efac'">
+            {{ kpi.lowStockCount + kpi.outOfStockCount }} mã SP
+          </strong>
+          <small>{{ kpi.outOfStockCount }} hết hàng · {{ kpi.lowStockCount }} chạm ngưỡng ROP</small>
+        </article>
+        <article class="surface dashboard-kpi-card">
+          <span>Quản lý Lô & Hạn (FEFO)</span>
+          <strong [style.color]="kpi.fefoWarningCount > 0 ? '#f59e0b' : '#86efac'">
+            {{ kpi.fefoWarningCount }} lô cần ưu tiên
+          </strong>
+          <small>Kiểm soát chất lượng & hạn bảo quản</small>
+        </article>
+      </div>
+
+      <!-- 2. KHỐI CẢNH BÁO HÀNG TỒN KHO TỐI THIỂU (REORDER POINT ALERT) -->
+      <section
+        *ngIf="kpi.alertProducts.length > 0"
+        class="surface"
+        style="margin-bottom:1.25rem;padding:1rem 1.25rem;border:1px solid rgba(245,158,11,0.55);background:linear-gradient(135deg, rgba(120,53,15,0.28), rgba(45,14,18,0.92));border-radius:10px;"
+      >
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.75rem;">
+          <div>
+            <strong style="color:#fcd34d;font-size:0.98rem;display:block;">
+              ⚠️ Cảnh báo chạm định mức tồn kho tối thiểu ({{ kpi.alertProducts.length }} sản phẩm cần nhập bù)
+            </strong>
+            <small class="muted">Hệ thống tự động phát hiện các mã có tồn kho ≤ Định mức tối thiểu (Reorder Point) để đề xuất lập phiếu nhập bù.</small>
+          </div>
+          <button type="button" class="button button--secondary button--small" (click)="inventoryFilter = 'LOW'; inventorySubTab = 'overview'">
+            Lọc xem tất cả mã chạm ngưỡng
+          </button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:0.65rem;">
+          <div
+            *ngFor="let item of kpi.alertProducts"
+            style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.6rem 0.85rem;background:rgba(0,0,0,0.38);border:1px solid rgba(245,158,11,0.3);border-radius:8px;"
+          >
+            <div style="min-width:0;">
+              <strong style="display:block;font-size:0.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ item.name }}</strong>
+              <small style="color:#fcd34d;font-size:0.78rem;">
+                Tồn hiện tại: <strong>{{ item.stock }}</strong> / Định mức tối thiểu: <strong>{{ getMinStock(item) }}</strong> · {{ getWarehouseLocation(item) }}
+              </small>
+            </div>
+            <div style="display:flex;gap:0.35rem;flex-shrink:0;">
+              <button
+                type="button"
+                class="button button--primary button--small"
+                style="padding:0.3rem 0.65rem;font-size:0.76rem;white-space:nowrap;"
+                (click)="quickRestockToSafeLevel(item)"
+              >
+                + Nhập bù tự động
+              </button>
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                style="padding:0.3rem 0.55rem;font-size:0.76rem;white-space:nowrap;"
+                (click)="openReceiptForProduct(item, 'IMPORT')"
+              >
+                Lập phiếu
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- THANH ĐIỀU HƯỚNG 4 PHÂN HỆ NGHIỆP VỤ KHO WMS (Bố cục 2x2: Mục 3 nằm hàng dưới cùng Mục 4) -->
+      <nav
+        class="surface"
+        aria-label="Phân hệ quản trị tồn kho"
+        style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.6rem;padding:0.6rem;margin-bottom:1.25rem;border-radius:10px;"
+      >
+        <button
+          type="button"
+          class="button button--small"
+          style="width:100%;justify-content:center;"
+          [ngClass]="inventorySubTab === 'overview' ? 'button--primary' : 'button--ghost'"
+          (click)="inventorySubTab = 'overview'"
+        >
+          1. Cân đối Nhập - Xuất - Tồn & Lô hạn ({{ products.length }})
+        </button>
+        <button
+          type="button"
+          class="button button--small"
+          style="width:100%;justify-content:center;"
+          [ngClass]="inventorySubTab === 'receipt' ? 'button--primary' : 'button--ghost'"
+          (click)="inventorySubTab = 'receipt'"
+        >
+          2. Lập phiếu Nhập / Xuất kho tự động
+        </button>
+        <button
+          type="button"
+          class="button button--small"
+          style="width:100%;justify-content:center;"
+          [ngClass]="inventorySubTab === 'audit' ? 'button--primary' : 'button--ghost'"
+          (click)="inventorySubTab = 'audit'"
+        >
+          3. Sơ đồ Vị trí Kệ & Kiểm kê thực tế
+        </button>
+        <button
+          type="button"
+          class="button button--small"
+          style="width:100%;justify-content:center;"
+          [ngClass]="inventorySubTab === 'ledger' ? 'button--primary' : 'button--ghost'"
+          (click)="inventorySubTab = 'ledger'"
+        >
+          4. Sổ cái Thẻ kho & Báo cáo giao dịch ({{ transactions.length }})
+        </button>
+      </nav>
+
+      <!-- ==================== PHÂN HỆ 1: BẢNG CÂN ĐỐI NHẬP - XUẤT - TỒN, ĐỊNH MỨC, LÔ & VỊ TRÍ ==================== -->
+      <ng-container *ngIf="inventorySubTab === 'overview'">
+        <section class="surface admin-toolbar" style="margin-bottom:1.1rem;display:grid;grid-template-columns:minmax(220px, 1fr) auto;gap:0.85rem;align-items:end;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:0.75rem;">
+            <label class="form-field" style="margin:0;">
+              <span class="form-label">Tìm kiếm SKU / Sản phẩm / Mã lô / Vị trí kệ</span>
+              <input class="form-control" type="search" [(ngModel)]="inventorySearch" placeholder="VD: AN-BG-001, LOT-BG, Kệ A1...">
+            </label>
+            <label class="form-field" style="margin:0;">
+              <span class="form-label">Khu vực lưu kho (Vị trí)</span>
+              <select class="form-control" [(ngModel)]="inventoryZoneFilter">
+                <option value="ALL">Tất cả khu vực kho (Khu A, B, C)</option>
+                <option value="ZONE_A">Khu A - Kho Board Game chính</option>
+                <option value="ZONE_B">Khu B - Kho Combo & Bộ sưu tập</option>
+                <option value="ZONE_C">Khu C - Kho Phụ kiện & Merchandise</option>
+              </select>
+            </label>
+          </div>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+            <button type="button" class="button button--small" [ngClass]="inventoryFilter === 'ALL' ? 'button--primary' : 'button--ghost'" (click)="inventoryFilter = 'ALL'">
+              Tất cả ({{ products.length }})
+            </button>
+            <button type="button" class="button button--small" [ngClass]="inventoryFilter === 'LOW' ? 'button--primary' : 'button--ghost'" (click)="inventoryFilter = 'LOW'">
+              Chạm định mức ({{ kpi.lowStockCount }})
+            </button>
+            <button type="button" class="button button--small" [ngClass]="inventoryFilter === 'OUT' ? 'button--primary' : 'button--ghost'" (click)="inventoryFilter = 'OUT'">
+              Hết hàng ({{ kpi.outOfStockCount }})
+            </button>
+            <button type="button" class="button button--small" [ngClass]="inventoryFilter === 'FEFO' ? 'button--primary' : 'button--ghost'" (click)="inventoryFilter = 'FEFO'">
+              Ưu tiên xuất FEFO ({{ kpi.fefoWarningCount }})
+            </button>
+            <button type="button" class="button button--small" [ngClass]="inventoryFilter === 'OK' ? 'button--primary' : 'button--ghost'" (click)="inventoryFilter = 'OK'">
+              An toàn
+            </button>
+          </div>
+        </section>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm & Mã SKU</th>
+                <th>Vị trí lưu kho</th>
+                <th>Lô hàng & Hạn bảo quản</th>
+                <th>Đầu kỳ · Nhập · Xuất</th>
+                <th>Tồn kho / Định mức</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let product of filteredInventoryProducts">
+                <td>
+                  <span class="table-product">
+                    <img [src]="product.images[0]" alt="">
+                    <div>
+                      <strong>{{ product.name }}</strong>
+                      <small class="muted" style="display:block;">SKU: {{ product.sku || ('AN-' + product.id) }} · Giá trị: {{ store.formatCurrency(product.stock * (product.discountPrice ?? product.price)) }}</small>
+                    </div>
+                  </span>
+                </td>
+                <td>
+                  <span style="display:inline-block;padding:0.25rem 0.55rem;border-radius:6px;background:rgba(213,183,107,0.12);border:1px solid rgba(213,183,107,0.3);font-size:0.8rem;font-weight:600;color:var(--color-gold-soft);white-space:nowrap;">
+                    📍 {{ getWarehouseLocation(product) }}
+                  </span>
+                </td>
+                <td>
+                  <div style="font-size:0.82rem;line-height:1.4;">
+                    <div><strong>{{ getBatchCode(product) }}</strong></div>
+                    <small class="muted" style="display:block;">Nhập: {{ store.formatDate(getImportDate(product)) }} · Hạn: {{ store.formatDate(getExpiryDate(product)) }}</small>
+                    <span class="status-badge" [ngClass]="getBatchStatus(product).badgeClass" style="font-size:0.7rem;padding:0.12rem 0.45rem;margin-top:0.2rem;display:inline-block;">
+                      {{ getBatchStatus(product).label }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div style="font-size:0.82rem;white-space:nowrap;line-height:1.45;">
+                    <div>Đầu kỳ: <strong>{{ getProductOpeningStock(product) }}</strong></div>
+                    <div>
+                      <span style="color:#86efac;">Nhập: +{{ getProductInboundTotal(product.id) }}</span>
+                      <span class="muted"> · </span>
+                      <span style="color:#fca5a5;">Xuất: -{{ getProductOutboundTotal(product.id) }}</span>
+                    </div>
+                    <small class="muted" *ngIf="getProductReservedQty(product.id) > 0">
+                      Đang giữ chỗ: {{ getProductReservedQty(product.id) }}
+                    </small>
+                  </div>
+                </td>
+                <td>
+                  <div style="min-width:130px;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:0.84rem;margin-bottom:0.25rem;">
+                      <strong [class.low-stock]="product.stock <= getMinStock(product)" style="font-size:1.05rem;">
+                        {{ product.stock }} đv
+                      </strong>
+                      <small class="muted">Tối thiểu: {{ getMinStock(product) }}</small>
+                    </div>
+                    <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;">
+                      <div
+                        [style.width.%]="getStockStatus(product).ratio"
+                        [style.background]="product.stock <= 0 ? '#ef4444' : (product.stock <= getMinStock(product) ? '#f59e0b' : '#22c55e')"
+                        style="height:100%;border-radius:inherit;"
+                      ></div>
+                    </div>
+                    <small class="muted" style="font-size:0.74rem;display:block;margin-top:0.2rem;">
+                      Khả dụng bán: <strong>{{ getProductAvailableStock(product) }}</strong>
+                    </small>
+                  </div>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="getStockStatus(product).badgeClass" style="white-space:nowrap;">
+                    {{ getStockStatus(product).label }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+
+      <!-- ==================== PHÂN HỆ 2: LẬP PHIẾU NHẬP / XUẤT KHO TỰ ĐỘNG THEO LÔ & VỊ TRÍ ==================== -->
+      <ng-container *ngIf="inventorySubTab === 'receipt'">
+        <section class="surface account-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:1rem;">
+            <div>
+              <p class="eyebrow" style="margin:0;">Nghiệp vụ Nhập - Xuất - Tồn tự động</p>
+              <h2 style="margin:0;">Lập Phiếu Nhập Kho / Xuất Kho Theo Lô</h2>
+            </div>
+            <button type="button" class="button button--ghost button--small" (click)="inventorySubTab = 'overview'">
+              ← Quay lại Bảng cân đối kho
+            </button>
+          </div>
+
+          <form class="form-grid" (ngSubmit)="submitWmsReceipt()">
+            <label class="form-field">
+              <span class="form-label">Loại chứng từ kho</span>
+              <select class="form-control" name="receiptType" [(ngModel)]="wmsReceiptForm.type">
+                <option value="IMPORT">Phiếu Nhập Kho (+ Cộng tồn kho tự động)</option>
+                <option value="EXPORT">Phiếu Xuất Kho (- Trừ tồn kho tự động)</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Sản phẩm (SKU)</span>
+              <select class="form-control" name="receiptProduct" [(ngModel)]="wmsReceiptForm.productId" (change)="onReceiptProductChange()">
+                <option *ngFor="let p of products" [ngValue]="p.id">
+                  {{ p.sku || ('AN-' + p.id) }} - {{ p.name }} (Tồn hiện tại: {{ p.stock }})
+                </option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Số lượng {{ wmsReceiptForm.type === 'EXPORT' ? 'xuất' : 'nhập' }}</span>
+              <input class="form-control" type="number" min="1" name="receiptQty" [(ngModel)]="wmsReceiptForm.quantity" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Định mức tồn tối thiểu (Cảnh báo ROP)</span>
+              <input class="form-control" type="number" min="0" name="receiptMinStock" [(ngModel)]="wmsReceiptForm.minStock" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Mã lô hàng (Batch / Lot Code)</span>
+              <input class="form-control" type="text" name="receiptBatch" [(ngModel)]="wmsReceiptForm.batchCode" placeholder="VD: LOT-BG-2026-04" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Hạn bảo quản / Kiểm định lô (FEFO)</span>
+              <input class="form-control" type="date" name="receiptExpiry" [(ngModel)]="wmsReceiptForm.expiryDate" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Vị trí kệ lưu trữ (Khu · Dãy · Kệ · Tầng)</span>
+              <input class="form-control" type="text" name="receiptLocation" [(ngModel)]="wmsReceiptForm.warehouseLocation" placeholder="VD: Khu A · Dãy 01 · Kệ A1-T2" required>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label">Nhân sự thực hiện</span>
+              <input class="form-control" type="text" name="receiptPerformer" [(ngModel)]="wmsReceiptForm.performer" required>
+            </label>
+
+            <label class="form-field form-field--full">
+              <span class="form-label">Diễn giải / Lý do lập phiếu</span>
+              <input class="form-control" type="text" name="receiptReason" [(ngModel)]="wmsReceiptForm.reason" placeholder="VD: Nhập kho lô in đợt 4 từ nhà in / Xuất hàng trưng bày sự kiện" required>
+            </label>
+
+            <div class="button-row form-field--full">
+              <button class="button button--primary" type="submit">
+                {{ wmsReceiptForm.type === 'EXPORT' ? 'Xác nhận Xuất kho & Trừ tồn tự động' : 'Xác nhận Nhập kho & Cộng tồn tự động' }}
+              </button>
+              <button class="button button--ghost" type="button" (click)="inventorySubTab = 'overview'">Hủy</button>
+            </div>
+          </form>
+        </section>
+      </ng-container>
+
+      <!-- ==================== PHÂN HỆ 3: QUẢN LÝ THEO VỊ TRÍ KỆ & KIỂM KÊ THỰC TẾ (AUDIT) ==================== -->
+      <ng-container *ngIf="inventorySubTab === 'audit'">
+        <section class="surface account-panel" style="margin-bottom:1.25rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.85rem;">
+            <div>
+              <p class="eyebrow" style="margin:0;">Sơ đồ vị trí kệ & Kiểm kê định kỳ</p>
+              <h2 style="margin:0;">Kiểm kê Tồn kho Thực tế & Cấu hình Định mức / Vị trí</h2>
+            </div>
+            <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+              <button type="button" class="button button--small" [ngClass]="inventoryZoneFilter === 'ALL' ? 'button--primary' : 'button--ghost'" (click)="inventoryZoneFilter = 'ALL'">
+                Tất cả khu
+              </button>
+              <button type="button" class="button button--small" [ngClass]="inventoryZoneFilter === 'ZONE_A' ? 'button--primary' : 'button--ghost'" (click)="inventoryZoneFilter = 'ZONE_A'">
+                Khu A (Board Game)
+              </button>
+              <button type="button" class="button button--small" [ngClass]="inventoryZoneFilter === 'ZONE_B' ? 'button--primary' : 'button--ghost'" (click)="inventoryZoneFilter = 'ZONE_B'">
+                Khu B (Combo)
+              </button>
+              <button type="button" class="button button--small" [ngClass]="inventoryZoneFilter === 'ZONE_C' ? 'button--primary' : 'button--ghost'" (click)="inventoryZoneFilter = 'ZONE_C'">
+                Khu C (Phụ kiện & Merch)
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Sản phẩm</th>
+                  <th>Vị trí lưu kho (Khu · Kệ)</th>
+                  <th>Mã lô & Hạn bảo quản</th>
+                  <th>Định mức tối thiểu</th>
+                  <th>Tồn hệ thống</th>
+                  <th>Tồn kiểm thực tế</th>
+                  <th>Chênh lệch</th>
+                  <th>Thao tác kiểm kê</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let product of filteredInventoryProducts">
+                  <td>
+                    <strong>{{ product.name }}</strong>
+                    <small class="muted" style="display:block;">SKU: {{ product.sku || ('AN-' + product.id) }}</small>
+                  </td>
+                  <td>
+                    <input
+                      class="form-control"
+                      type="text"
+                      style="min-width:175px;min-height:40px;padding:0.35rem 0.6rem;font-size:0.82rem;"
+                      [(ngModel)]="locationEditMap[product.id]"
+                    >
+                  </td>
+                  <td>
+                    <div style="display:grid;gap:0.3rem;min-width:145px;">
+                      <input
+                        class="form-control"
+                        type="text"
+                        style="min-height:36px;padding:0.25rem 0.5rem;font-size:0.8rem;"
+                        [(ngModel)]="batchEditMap[product.id]"
+                        placeholder="Mã lô"
+                      >
+                      <input
+                        class="form-control"
+                        type="date"
+                        style="min-height:36px;padding:0.25rem 0.5rem;font-size:0.8rem;"
+                        [(ngModel)]="expiryEditMap[product.id]"
+                      >
+                    </div>
+                  </td>
+                  <td>
+                    <input
+                      class="form-control"
+                      type="number"
+                      min="0"
+                      style="width:78px;min-height:40px;padding:0.35rem 0.5rem;font-size:0.86rem;"
+                      [(ngModel)]="minStockEditMap[product.id]"
+                    >
+                  </td>
+                  <td>
+                    <strong style="font-size:1rem;">{{ product.stock }}</strong>
+                  </td>
+                  <td>
+                    <input
+                      class="form-control"
+                      type="number"
+                      min="0"
+                      style="width:86px;min-height:40px;padding:0.35rem 0.5rem;font-size:0.9rem;font-weight:700;"
+                      [(ngModel)]="auditActualCountMap[product.id]"
+                    >
+                  </td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [ngClass]="getAuditVariance(product) === 0 ? 'status-badge--success' : (getAuditVariance(product) > 0 ? 'status-badge--warning' : 'status-badge--danger')"
+                      style="white-space:nowrap;"
+                    >
+                      {{ getAuditVariance(product) === 0 ? 'Khớp (0)' : (getAuditVariance(product) > 0 ? 'Thừa +' + getAuditVariance(product) : 'Thiếu ' + getAuditVariance(product)) }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="button button--primary button--small"
+                      style="padding:0.35rem 0.75rem;font-size:0.78rem;white-space:nowrap;"
+                      (click)="submitSingleAudit(product)"
+                    >
+                      {{ getAuditVariance(product) === 0 ? 'Lưu cấu hình & Xác nhận' : 'Cân bằng kho' }}
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </ng-container>
+
+      <!-- ==================== PHÂN HỆ 4: SỔ CÁI THẺ KHO & LỊCH SỬ CHỨNG TỪ REALTIME ==================== -->
+      <ng-container *ngIf="inventorySubTab === 'ledger'">
+        <section class="surface admin-toolbar" style="margin-bottom:1.1rem;display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;">
+          <label class="form-field" style="flex:1;min-width:240px;margin:0;">
+            <span class="form-label">Tra cứu mã chứng từ / sản phẩm / mã lô / lý do</span>
+            <input class="form-control" type="search" [(ngModel)]="ledgerSearch" placeholder="Nhập mã phiếu (PNK, PXK, PKK), tên SP hoặc lý do...">
+          </label>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+            <button type="button" class="button button--small" [ngClass]="ledgerTypeFilter === 'ALL' ? 'button--primary' : 'button--ghost'" (click)="ledgerTypeFilter = 'ALL'">
+              Tất cả chứng từ
+            </button>
+            <button type="button" class="button button--small" [ngClass]="ledgerTypeFilter === 'IMPORT' ? 'button--primary' : 'button--ghost'" (click)="ledgerTypeFilter = 'IMPORT'">
+              Phiếu Nhập Kho
+            </button>
+            <button type="button" class="button button--small" [ngClass]="ledgerTypeFilter === 'SALE' ? 'button--primary' : 'button--ghost'" (click)="ledgerTypeFilter = 'SALE'">
+              Xuất Bán Hàng
+            </button>
+            <button type="button" class="button button--small" [ngClass]="ledgerTypeFilter === 'AUDIT' ? 'button--primary' : 'button--ghost'" (click)="ledgerTypeFilter = 'AUDIT'">
+              Phiếu Kiểm Kê
+            </button>
+          </div>
+        </section>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Mã chứng từ</th>
+                <th>Thời gian</th>
+                <th>Sản phẩm</th>
+                <th>Loại nghiệp vụ</th>
+                <th>Lô & Vị trí</th>
+                <th>Biến động</th>
+                <th>Tồn Trước → Sau</th>
+                <th>Diễn giải chứng từ</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tx of filteredTransactions.slice(0, 30)">
+                <td>
+                  <strong style="color:var(--color-gold-soft);font-size:0.84rem;white-space:nowrap;">
+                    {{ tx.docCode || ('CT-' + tx.id) }}
+                  </strong>
+                </td>
+                <td style="white-space:nowrap;font-size:0.84rem;">{{ tx.createdAt || 'Hôm nay' }}</td>
+                <td>
+                  <strong>{{ store.getProduct(tx.productId)?.name || 'Sản phẩm' }}</strong>
+                </td>
+                <td>
+                  <span class="status-badge" [ngClass]="transactionBadgeClass(tx.type, tx.change)" style="white-space:nowrap;">
+                    {{ transactionTypeLabel(tx.type) }}
+                  </span>
+                </td>
+                <td style="font-size:0.8rem;">
+                  <div>{{ tx.batchCode || ('LOT-2026-0' + ((tx.productId % 4) + 1)) }}</div>
+                  <small class="muted">{{ tx.warehouseLocation || 'Khu A · Kệ tiêu chuẩn' }}</small>
+                </td>
+                <td>
+                  <strong [style.color]="tx.change >= 0 ? '#86efac' : '#fca5a5'" style="font-size:0.98rem;">
+                    {{ tx.change > 0 ? '+' : '' }}{{ tx.change }}
+                  </strong>
+                </td>
+                <td style="white-space:nowrap;">{{ tx.before }} → <strong>{{ tx.after }}</strong></td>
+                <td style="font-size:0.85rem;">{{ tx.reason }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <!-- ==================== TAB 5: ORDERS ==================== -->
+    <ng-container *ngIf="activeTab === 'orders'">
+      <!-- Chi tiết đơn hàng trong Admin -->
+      <ng-container *ngIf="selectedOrderId; else ordersTableList">
+        <section class="surface account-panel admin-order-detail" *ngIf="selectedOrder as ord; else orderNotFound">
+          <div class="admin-detail-header">
+            <div>
+              <p class="eyebrow">Chi tiết đơn hàng</p>
+              <h2>{{ ord.code }}</h2>
+            </div>
+            <span class="status-badge" [ngClass]="store.statusBadgeModifier(ord.status)">
+              {{ store.statusLabel(ord.status) }}
+            </span>
+          </div>
+          <div class="admin-detail-grid">
+            <div><strong>Ngày tạo</strong><p>{{ store.formatDate(ord.createdAt) }}</p></div>
+            <div><strong>Thanh toán</strong><p>{{ adminPaymentLabel(ord) }}</p></div>
+            <div><strong>Người nhận</strong><p>{{ ord.address.receiverName }} · {{ ord.address.receiverPhone }}</p></div>
+            <div><strong>Địa chỉ</strong><p>{{ ord.address.detail }}</p></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Sản phẩm</th>
+                  <th>Số lượng</th>
+                  <th>Đơn giá</th>
+                  <th>Thành tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of ord.items">
+                  <td>
+                    <span class="table-product">
+                      <img [src]="store.getProduct(item.productId)?.images?.[0] || '/img/products/18.png'" alt="">
+                      <strong>{{ store.getProduct(item.productId)?.name || 'Sản phẩm' }}</strong>
+                    </span>
+                  </td>
+                  <td>{{ item.quantity }}</td>
+                  <td>{{ store.formatCurrency(item.unitPrice) }}</td>
+                  <td>{{ store.formatCurrency(item.unitPrice * item.quantity) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="summary-line summary-line--total">
+            <span>Tổng đơn</span>
+            <strong>{{ store.formatCurrency(ord.total) }}</strong>
+          </div>
+          <div class="button-row">
+            <a class="button button--ghost" [routerLink]="['/admin']" [queryParams]="{ tab: 'orders' }">Quay lại danh sách</a>
+            <button
+              *ngIf="ord.status === 'PENDING'"
+              class="button button--primary"
+              type="button"
+              (click)="updateOrderStatus(ord.id, 'CONFIRMED')"
+            >
+              Xác nhận đơn hàng
+            </button>
+            <a
+              *ngIf="ord.status === 'DELIVERED'"
+              class="button button--secondary"
+              [routerLink]="['/admin']"
+              [queryParams]="{ tab: 'returns' }"
+            >
+              Xem yêu cầu đổi/trả
+            </a>
+          </div>
+        </section>
+
+        <ng-template #orderNotFound>
+          <div class="empty-state">
+            <div>
+              <div class="empty-state__symbol" aria-hidden="true">◇</div>
+              <h3>Không tìm thấy đơn hàng</h3>
+              <p class="muted">Mã đơn không còn tồn tại trong dữ liệu demo.</p>
+            </div>
+          </div>
+        </ng-template>
+      </ng-container>
+
+      <!-- Danh sách đơn hàng -->
+      <ng-template #ordersTableList>
+        <div class="table-wrap">
+          <table class="data-table admin-orders-table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Ngày</th>
+                <th>Tổng</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Cập nhật</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let order of orders">
+                <td>
+                  <a class="admin-order-code" [routerLink]="['/admin']" [queryParams]="{ tab: 'orders', orderId: order.id }">
+                    {{ order.code }}
+                  </a>
+                  <small class="admin-request-note" *ngIf="order.cancellationRequest?.status === 'PENDING'">
+                    Yêu cầu hủy: {{ order.cancellationRequest?.reason }}
+                  </small>
+                </td>
+                <td>{{ store.formatDate(order.createdAt) }}</td>
+                <td>{{ store.formatCurrency(order.total) }}</td>
+                <td>{{ adminPaymentLabel(order) }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="store.statusBadgeModifier(order.status)">
+                    {{ store.statusLabel(order.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="button-row admin-order-actions">
+                    <select class="form-control" [(ngModel)]="orderStatusMap[order.id]">
+                      <option *ngFor="let st of allowedOrderStatuses(order)" [value]="st">
+                        {{ store.statusLabel(st) }}
+                      </option>
+                    </select>
+                    <button class="button button--primary button--small" type="button" (click)="updateOrderStatus(order.id)">
+                      Lưu
+                    </button>
+                    <button
+                      *ngIf="order.status === 'PENDING'"
+                      class="button button--secondary button--small"
+                      type="button"
+                      (click)="updateOrderStatus(order.id, 'CONFIRMED')"
+                    >
+                      Xác nhận ĐH
+                    </button>
+                    <ng-container *ngIf="order.cancellationRequest?.status === 'PENDING'">
+                      <button
+                        class="button button--danger button--small"
+                        type="button"
+                        (click)="resolveCancellation(order.id, 'APPROVED')"
+                      >
+                        Duyệt hủy
+                      </button>
+                      <button
+                        class="button button--ghost button--small"
+                        type="button"
+                        (click)="resolveCancellation(order.id, 'REJECTED')"
+                      >
+                        Từ chối
+                      </button>
+                    </ng-container>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- ==================== TAB 6: VOUCHERS ==================== -->
+    <ng-container *ngIf="activeTab === 'vouchers'">
+      <section class="admin-promotion-summary">
+        <article class="surface metric-card">
+          <span class="muted">Promotion đang chạy</span>
+          <strong>{{ activeVoucherCount }}</strong>
+          <span>Voucher còn hiệu lực</span>
+        </article>
+        <article class="surface metric-card">
+          <span class="muted">Lượt đã dùng</span>
+          <strong>{{ usedVoucherTotal }}</strong>
+          <span>Tổng lượt trong dữ liệu demo</span>
+        </article>
+        <article class="surface metric-card">
+          <span class="muted">Gợi ý</span>
+          <strong>Voucher rõ điều kiện</strong>
+          <span>Hiển thị điều kiện, hạn dùng và lượt dùng rõ ràng</span>
+        </article>
+      </section>
+
+      <section class="surface account-panel">
+        <h2>Tạo promotion / voucher</h2>
+        <form id="admin-voucher-form" class="form-grid" (ngSubmit)="onSubmitVoucher()">
+          <label class="form-field">
+            <span class="form-label">Mã voucher</span>
+            <input class="form-control" name="code" required [(ngModel)]="voucherForm.code">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Tên chương trình</span>
+            <input class="form-control" name="name" [(ngModel)]="voucherForm.name">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Loại giảm</span>
+            <select class="form-control" name="type" [(ngModel)]="voucherForm.type">
+              <option value="percentage">Phần trăm</option>
+              <option value="fixed">Số tiền</option>
+              <option value="shipping">Miễn phí vận chuyển</option>
+            </select>
+          </label>
+          <label class="form-field">
+            <span class="form-label">Giá trị</span>
+            <input class="form-control" type="number" name="value" min="1" required [(ngModel)]="voucherForm.value">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Giảm tối đa</span>
+            <input class="form-control" type="number" name="maxDiscount" [(ngModel)]="voucherForm.maxDiscount">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Đơn tối thiểu</span>
+            <input class="form-control" type="number" name="minOrder" [(ngModel)]="voucherForm.minOrder">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Bắt đầu</span>
+            <input class="form-control" type="datetime-local" name="startAt" [(ngModel)]="voucherForm.startAt">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Kết thúc</span>
+            <input class="form-control" type="datetime-local" name="endAt" [(ngModel)]="voucherForm.endAt">
+          </label>
+          <label class="form-field">
+            <span class="form-label">Giới hạn lượt</span>
+            <input class="form-control" type="number" name="usageLimit" [(ngModel)]="voucherForm.usageLimit">
+          </label>
+          <div class="button-row form-field--full">
+            <button class="button button--primary" type="submit">Lưu khuyến mãi</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="section section--compact">
+        <div class="admin-voucher-grid">
+          <article class="surface admin-voucher-card" *ngFor="let voucher of vouchers">
+            <div>
+              <span class="status-badge" [ngClass]="voucher.status === 'ACTIVE' ? 'status-badge--success' : 'status-badge--danger'" style="margin-bottom:0.4rem;">
+                {{ voucher.status === 'ACTIVE' ? 'Đang hiệu lực' : 'Đã ngưng' }}
+              </span>
+            </div>
+            <h3>{{ voucher.code }}</h3>
+            <p>{{ voucher.name || 'Voucher' }}</p>
+            <div class="summary-line">
+              <span>Đơn tối thiểu</span>
+              <strong>{{ store.formatCurrency(voucher.minOrder) }}</strong>
+            </div>
+            <div class="summary-line">
+              <span>Hết hạn</span>
+              <strong>{{ store.formatDate(voucher.endAt) }}</strong>
+            </div>
+            <div class="summary-line">
+              <span>Lượt dùng</span>
+              <strong>{{ voucher.usedCount }}/{{ voucher.usageLimit }}</strong>
+            </div>
+            <button class="button button--ghost button--small" type="button" (click)="toggleVoucher(voucher.code)">
+              {{ voucher.status === 'ACTIVE' ? 'Tắt' : 'Bật' }}
+            </button>
+          </article>
+        </div>
+      </section>
+    </ng-container>
+
+    <!-- ==================== TAB 7: RETURNS ==================== -->
+    <ng-container *ngIf="activeTab === 'returns'">
+      <div class="table-wrap" *ngIf="returns.length; else emptyReturns">
+        <table class="data-table admin-review-table">
+          <thead>
+            <tr>
+              <th>Mã</th>
+              <th>Sản phẩm</th>
+              <th>Lý do khách</th>
+              <th>Minh chứng ảnh</th>
+              <th>Trạng thái</th>
+              <th>Ghi chú admin</th>
+              <th>Xử lý</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let req of returns">
+              <td>{{ req.code }}</td>
+              <td>{{ store.getProduct(req.productId)?.name || 'Sản phẩm' }}</td>
+              <td>{{ req.reason }}</td>
+              <td>
+                <div *ngIf="getEvidenceImages(req).length; else noEvidence" style="display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center;">
+                  <img
+                    *ngFor="let img of getEvidenceImages(req)"
+                    [src]="img"
+                    alt="Minh chứng"
+                    style="width:48px;height:48px;object-fit:cover;border-radius:6px;border:1px solid var(--color-gold-soft);cursor:pointer;"
+                    (click)="previewEvidenceUrl = img"
+                    title="Bấm để phóng to xem chi tiết"
+                  />
+                  <small class="muted" style="display:block;width:100%;font-size:0.72rem;">({{ getEvidenceImages(req).length }} ảnh)</small>
+                </div>
+                <ng-template #noEvidence>
+                  <span style="display:inline-block;padding:0.25rem 0.5rem;border-radius:6px;font-size:0.75rem;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);">
+                    ⚠ Thiếu ảnh minh chứng
+                  </span>
+                </ng-template>
+              </td>
+              <td>
+                <span class="status-badge" [ngClass]="store.statusBadgeModifier(req.status)">
+                  {{ store.statusLabel(req.status) }}
+                </span>
+              </td>
+              <td>
+                <textarea
+                  class="form-control admin-return-note"
+                  rows="3"
+                  placeholder="Nhập lý do nếu từ chối"
+                  [(ngModel)]="returnNotes[req.id]"
+                ></textarea>
+              </td>
+              <td>
+                <div class="button-row admin-stacked-actions">
+                  <button
+                    class="button button--primary button--small"
+                    type="button"
+                    [disabled]="req.status !== 'PENDING' || !getEvidenceImages(req).length"
+                    [title]="!getEvidenceImages(req).length ? 'Không thể duyệt đơn đổi/trả nếu thiếu ảnh minh chứng' : 'Duyệt yêu cầu và cập nhật tồn kho'"
+                    (click)="resolveReturn(req.id, 'APPROVED')"
+                  >
+                    Duyệt & nhập kho
+                  </button>
+                  <button
+                    class="button button--danger button--small"
+                    type="button"
+                    [disabled]="req.status !== 'PENDING'"
+                    (click)="resolveReturn(req.id, 'REJECTED')"
+                  >
+                    Từ chối
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Modal phóng to xem ảnh minh chứng -->
+      <div
+        *ngIf="previewEvidenceUrl"
+        class="evidence-lightbox-overlay"
+        style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1.5rem;"
+        (click)="previewEvidenceUrl = null"
+      >
+        <div style="position:relative;max-width:90vw;max-height:90vh;text-align:center;" (click)="$event.stopPropagation()">
+          <img
+            [src]="previewEvidenceUrl"
+            alt="Minh chứng chi tiết"
+            style="max-width:100%;max-height:80vh;border-radius:8px;border:2px solid var(--color-gold-soft);box-shadow:0 12px 36px rgba(0,0,0,0.6);object-fit:contain;"
+          />
+          <div style="margin-top:0.75rem;">
+            <button class="button button--secondary button--small" type="button" (click)="previewEvidenceUrl = null">
+              Đóng xem ảnh [ESC]
+            </button>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyReturns>
+        <div class="empty-state">
+          <div>
+            <div class="empty-state__symbol" aria-hidden="true">◇</div>
+            <h3>Chưa có yêu cầu đổi/trả</h3>
+            <p class="muted">Yêu cầu của khách hàng sẽ xuất hiện tại đây.</p>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+
+    <!-- ==================== TAB 8: REVIEWS ==================== -->
+    <ng-container *ngIf="activeTab === 'reviews' && reviewStats as rStats">
+      <section class="admin-promotion-summary review-analytics">
+        <article class="surface metric-card">
+          <span class="muted">Tổng review</span>
+          <strong>{{ rStats.total }}</strong>
+          <span>Đánh giá hiển thị và ẩn</span>
+        </article>
+        <article class="surface metric-card">
+          <span class="muted">Rating trung bình</span>
+          <strong>{{ rStats.average }}★</strong>
+          <span>Theo dữ liệu demo</span>
+        </article>
+        <article class="surface metric-card">
+          <span class="muted">Từ khóa tốt</span>
+          <strong>{{ rStats.goodKeywordsCount }}</strong>
+          <span>Gợi ý sentiment tích cực</span>
+        </article>
+      </section>
+
+      <section class="surface account-panel">
+        <h2>Phân bố sao</h2>
+        <div class="admin-status-bars">
+          <div *ngFor="let item of rStats.byStar">
+            <span>{{ item.star }} sao</span>
+            <strong>{{ item.count }}</strong>
+            <i [style.width.%]="Math.max(8, item.count * 22)"></i>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--compact">
+        <h2>Rating - bán ra - doanh thu</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Rating TB</th>
+                <th>Review</th>
+                <th>Đã bán</th>
+                <th>Doanh thu</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of rStats.productRows">
+                <td>{{ row.product.name }}</td>
+                <td>{{ row.avg }}</td>
+                <td>{{ row.reviews.length }}</td>
+                <td>{{ row.sold }}</td>
+                <td>{{ store.formatCurrency(row.revenue) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="surface admin-toolbar">
+        <label class="form-field">
+          <span class="form-label">Lọc theo số sao</span>
+          <select
+            class="form-control"
+            id="admin-review-rating-filter"
+            [ngModel]="starFilter"
+            (ngModelChange)="onReviewStarFilterChange($event)"
+          >
+            <option value="all">Tất cả</option>
+            <option value="5">5 sao</option>
+            <option value="4">4 sao</option>
+            <option value="3">3 sao</option>
+            <option value="2">2 sao</option>
+            <option value="1">1 sao</option>
+          </select>
+        </label>
+      </section>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Sản phẩm</th>
+              <th>Điểm</th>
+              <th>Nhận xét</th>
+              <th>Từ khóa tốt</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let review of filteredReviews">
+              <td>{{ store.getProduct(review.productId)?.name || 'Sản phẩm' }}</td>
+              <td><span class="stars">{{ starString(review.rating) }}</span></td>
+              <td>{{ review.comment }}</td>
+              <td>{{ reviewSentiment(review.comment).join(', ') || '-' }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="store.statusBadgeModifier(review.status)">
+                  {{ store.statusLabel(review.status) }}
+                </span>
+              </td>
+              <td>
+                <button class="button button--ghost button--small" type="button" (click)="toggleReview(review.id)">
+                  {{ review.status === 'VISIBLE' ? 'Ẩn' : 'Hiện' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <!-- ==================== TAB 9: BLOGS ==================== -->
+    <ng-container *ngIf="activeTab === 'blogs'">
+      <section class="surface account-panel">
+        <h2>Tạo bài viết</h2>
+        <form id="admin-blog-form" class="form-grid" (ngSubmit)="onSubmitAdminBlog('PUBLISHED')">
+          <label class="form-field form-field--full">
+            <span class="form-label">Tiêu đề</span>
+            <input class="form-control" name="title" required [(ngModel)]="blogForm.title">
+          </label>
+          <label class="form-field form-field--full">
+            <span class="form-label">Tóm tắt</span>
+            <textarea class="form-control" name="excerpt" [(ngModel)]="blogForm.excerpt"></textarea>
+          </label>
+          <div class="button-row">
+            <button class="button button--ghost" type="button" (click)="onSubmitAdminBlog('DRAFT')">Lưu bản nháp</button>
+            <button class="button button--primary" type="submit">Đăng ngay</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="surface account-panel admin-user-blog-review">
+        <h2>Duyệt blog từ người dùng</h2>
+        <div class="table-wrap" *ngIf="userBlogSubmissions.length; else emptyUserBlogs">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bài viết</th>
+                <th>Tác giả</th>
+                <th>Ngày gửi</th>
+                <th>Trạng thái</th>
+                <th>Ghi chú duyệt</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let post of userBlogSubmissions">
+                <td>
+                  <strong>{{ post.title }}</strong>
+                  <small>{{ post.excerpt || (post.content | slice:0:120) }}</small>
+                  <small *ngIf="post.image">Ảnh: {{ post.image }}</small>
+                </td>
+                <td>{{ post.authorName || 'Khách hàng' }}</td>
+                <td>{{ store.formatDate(post.createdAt) }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="store.statusBadgeModifier(post.status)">
+                    {{ store.statusLabel(post.status) }}
+                  </span>
+                </td>
+                <td>
+                  <textarea
+                    class="form-control admin-blog-note"
+                    rows="3"
+                    placeholder="Nhập lý do nếu từ chối"
+                    [(ngModel)]="userBlogNotes[post.id]"
+                  ></textarea>
+                </td>
+                <td>
+                  <div class="button-row admin-stacked-actions">
+                    <button
+                      class="button button--primary button--small"
+                      type="button"
+                      [disabled]="post.status !== 'PENDING'"
+                      (click)="resolveUserBlog(post.id, 'APPROVED')"
+                    >
+                      Duyệt đăng
+                    </button>
+                    <button
+                      class="button button--danger button--small"
+                      type="button"
+                      [disabled]="post.status !== 'PENDING'"
+                      (click)="resolveUserBlog(post.id, 'REJECTED')"
+                    >
+                      Từ chối
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #emptyUserBlogs>
+          <div class="empty-state">
+            <div>
+              <div class="empty-state__symbol" aria-hidden="true">◇</div>
+              <h3>Chưa có blog user gửi</h3>
+              <p class="muted">Bài chia sẻ trải nghiệm của khách hàng sẽ chờ duyệt tại đây.</p>
+            </div>
+          </div>
+        </ng-template>
+      </section>
+
+      <section class="section section--compact">
+        <h2>Bài viết của shop</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Tiêu đề & Tóm tắt</th>
+                <th>Ngày</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let post of blogs">
+                <td>
+                  <strong>{{ post.title }}</strong>
+                  <small class="muted" style="display:block;">{{ post.excerpt }}</small>
+                </td>
+                <td>{{ store.formatDate(post.date) }}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="post.status === 'PUBLISHED' ? 'status-badge--success' : 'status-badge--warning'">
+                    {{ post.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="button-row">
+                    <button
+                      class="button button--secondary button--small"
+                      type="button"
+                      (click)="openBlogPreview(post)"
+                    >
+                      👁️ Xem trước {{ post.status === 'DRAFT' ? 'bản nháp' : 'bài viết' }}
+                    </button>
+                    <button
+                      *ngIf="post.status !== 'PUBLISHED'"
+                      class="button button--primary button--small"
+                      type="button"
+                      (click)="toggleBlog(post.id)"
+                    >
+                      Đăng ngay
+                    </button>
+                    <button
+                      *ngIf="post.status === 'PUBLISHED'"
+                      class="button button--ghost button--small"
+                      type="button"
+                      (click)="toggleBlog(post.id)"
+                    >
+                      Chuyển về Nháp
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Modal Xem trước bản nháp Blog để duyệt trước khi bấm Publish -->
+      <div
+        *ngIf="previewBlogPost as preview"
+        class="modal-backdrop"
+        (click)="$event.target === $event.currentTarget && closeBlogPreview()"
+      >
+        <article class="modal surface" role="dialog" aria-modal="true" style="max-width:640px;">
+          <button class="modal-close" type="button" (click)="closeBlogPreview()" aria-label="Đóng">×</button>
+          <p class="eyebrow">Xem trước bài viết · {{ preview.status === 'PUBLISHED' ? 'Đã xuất bản' : 'Bản nháp' }}</p>
+          <h2>{{ preview.title }}</h2>
+          <p class="muted">Ngày tạo: {{ store.formatDate(preview.date) }}</p>
+          <img
+            *ngIf="preview.image"
+            [src]="preview.image"
+            [alt]="preview.title"
+            style="width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin:0.75rem 0;"
+          >
+          <div style="padding:0.85rem;background:rgba(0,0,0,0.3);border-radius:8px;margin-bottom:1rem;line-height:1.6;">
+            <p style="margin:0;">{{ preview.excerpt }}</p>
+          </div>
+          <div class="button-row">
+            <button
+              *ngIf="preview.status !== 'PUBLISHED'"
+              class="button button--primary"
+              type="button"
+              (click)="publishFromPreview(preview)"
+            >
+              Duyệt & Đăng ngay
+            </button>
+            <button class="button button--ghost" type="button" (click)="closeBlogPreview()">Đóng cửa sổ xem trước</button>
+          </div>
+        </article>
+      </div>
+    </ng-container>
+
+    <!-- ==================== TAB 10: TƯ VẤN VIÊN & PHÂN TÍCH CẢM XÚC KHÁCH HÀNG (XANH / CAM / ĐỎ) ==================== -->
+    <ng-container *ngIf="activeTab === 'advisor' && advisorStats as aStats">
+      <div class="dashboard-kpi-strip" style="margin-bottom:1.25rem;">
+        <article class="surface dashboard-kpi-card">
+          <span>Tổng phiên kết nối</span>
+          <strong>{{ aStats.total }}</strong>
+          <small>{{ aStats.pendingCount }} phiên đang chờ phản hồi</small>
+        </article>
+        <article class="surface dashboard-kpi-card" style="border-color:rgba(239,68,68,0.55);">
+          <span style="color:#fca5a5;">🔴 Mức Đỏ - Bức xúc cao</span>
+          <strong style="color:#ef4444;">{{ aStats.redCount }}</strong>
+          <small>Cần xoa dịu & xử lý đền bù khẩn cấp</small>
+        </article>
+        <article class="surface dashboard-kpi-card" style="border-color:rgba(245,158,11,0.55);">
+          <span style="color:#fcd34d;">🟠 Mức Cam - Sốt ruột / Khiếu nại</span>
+          <strong style="color:#f59e0b;">{{ aStats.orangeCount }}</strong>
+          <small>Cần kiểm tra hành trình đơn & giải đáp</small>
+        </article>
+        <article class="surface dashboard-kpi-card" style="border-color:rgba(34,197,94,0.55);">
+          <span style="color:#86efac;">🟢 Mức Xanh - Bình tĩnh / Đã dịu</span>
+          <strong style="color:#22c55e;">{{ aStats.greenCount }}</strong>
+          <small>Tư vấn thông tin sản phẩm & gói quà</small>
+        </article>
+      </div>
+
+      <section class="surface admin-toolbar" style="margin-bottom:1.25rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+        <div>
+          <strong style="color:var(--color-gold-soft);">Bảng điều phối Tư vấn viên theo tín hiệu cảm xúc (AI Thư Đồng chuyển tiếp)</strong>
+          <small class="muted" style="display:block;">Hiển thị song song tin nhắn gốc của khách, bản chuyển ngữ lịch sự và gợi ý kịch bản phản hồi phù hợp.</small>
+        </div>
+        <div style="display:flex;gap:0.45rem;flex-wrap:wrap;">
+          <button type="button" class="button button--small" [ngClass]="advisorEmotionFilter === 'ALL' ? 'button--primary' : 'button--ghost'" (click)="advisorEmotionFilter = 'ALL'">
+            Tất cả ({{ aStats.total }})
+          </button>
+          <button type="button" class="button button--small" [ngClass]="advisorEmotionFilter === 'RED' ? 'button--primary' : 'button--ghost'" (click)="advisorEmotionFilter = 'RED'">
+            🔴 Đỏ - Bức xúc ({{ aStats.redCount }})
+          </button>
+          <button type="button" class="button button--small" [ngClass]="advisorEmotionFilter === 'ORANGE' ? 'button--primary' : 'button--ghost'" (click)="advisorEmotionFilter = 'ORANGE'">
+            🟠 Cam - Khiếu nại ({{ aStats.orangeCount }})
+          </button>
+          <button type="button" class="button button--small" [ngClass]="advisorEmotionFilter === 'GREEN' ? 'button--primary' : 'button--ghost'" (click)="advisorEmotionFilter = 'GREEN'">
+            🟢 Xanh - Bình tĩnh ({{ aStats.greenCount }})
+          </button>
+          <button type="button" class="button button--secondary button--small" (click)="store.syncStateFromBackend()">
+            ↻ Làm mới phiên chat
+          </button>
+        </div>
+      </section>
+
+      <div style="display:grid;gap:1.1rem;">
+        <article
+          *ngFor="let ticket of filteredAdvisorTickets"
+          class="surface"
+          style="padding:1.25rem;border-radius:12px;"
+          [style.borderLeft]="'6px solid ' + (ticket.emotionColor || '#22c55e')"
+        >
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;margin-bottom:0.9rem;">
+            <div>
+              <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+                <strong style="font-size:1.08rem;color:var(--color-gold-soft);">{{ ticket.ticketCode }}</strong>
+                <span>·</span>
+                <strong>Khách hàng: {{ ticket.customerName }}</strong>
+                <span class="muted">({{ ticket.customerPhone }})</span>
+                <span class="muted">· {{ ticket.createdAt }}</span>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+              <span
+                style="display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.75rem;border-radius:999px;background:rgba(0,0,0,0.45);font-size:0.82rem;font-weight:700;"
+                [style.color]="ticket.emotionColor"
+                [style.border]="'1px solid ' + ticket.emotionColor"
+              >
+                <span [style.background]="ticket.emotionColor" style="width:9px;height:9px;border-radius:50%;display:inline-block;"></span>
+                {{ ticket.emotionLabel }}
+              </span>
+              <span class="status-badge" [ngClass]="ticket.status === 'RESOLVED' ? 'status-badge--success' : 'status-badge--warning'">
+                {{ ticket.status === 'RESOLVED' ? 'Đã phản hồi & Xoa dịu' : 'Chờ Tư vấn viên xử lý' }}
+              </span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:0.85rem;margin-bottom:1rem;">
+            <div style="padding:0.85rem;border-radius:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);">
+              <small class="muted" style="display:block;margin-bottom:0.25rem;">Nội dung gốc khách hàng nhắn trên Chatbot:</small>
+              <p style="margin:0;color:#fca5a5;font-weight:600;">"{{ ticket.originalMessage }}"</p>
+            </div>
+            <div style="padding:0.85rem;border-radius:8px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.28);">
+              <small style="color:#86efac;display:block;margin-bottom:0.25rem;font-weight:700;">AI Thư Đồng chuyển ngữ lịch sự & Tóm tắt vấn đề:</small>
+              <p style="margin:0;color:#ecfdf5;">"{{ ticket.softenedMessage }}"</p>
+            </div>
+          </div>
+
+          <div *ngIf="ticket.advisorReply" style="padding:0.75rem 1rem;border-radius:8px;background:rgba(213,183,107,0.12);border:1px solid rgba(213,183,107,0.35);margin-bottom:0.9rem;font-size:0.9rem;">
+            <strong style="color:var(--color-gold-soft);">👩‍💼 Phản hồi gần nhất của Tư vấn viên:</strong>
+            <p style="margin:0.25rem 0 0 0;">{{ ticket.advisorReply }}</p>
+          </div>
+
+          <div style="display:flex;gap:0.45rem;flex-wrap:wrap;margin-bottom:0.65rem;">
+            <small class="muted" style="align-self:center;margin-right:0.25rem;">Gợi ý kịch bản phản hồi theo màu cảm xúc:</small>
+            <button type="button" class="button button--ghost button--small" style="padding:0.25rem 0.6rem;font-size:0.76rem;" (click)="applyQuickAdvisorReply(ticket, 'APOLOGIZE_COMPENSATE')">
+              🕊️ Xoa dịu ĐỎ (Xin lỗi + Đổi mới 1-1 & Tặng Voucher)
+            </button>
+            <button type="button" class="button button--ghost button--small" style="padding:0.25rem 0.6rem;font-size:0.76rem;" (click)="applyQuickAdvisorReply(ticket, 'EXPEDITE_SHIPPING')">
+              🚚 Hỗ trợ CAM (Giục bưu cục giao gấp)
+            </button>
+            <button type="button" class="button button--ghost button--small" style="padding:0.25rem 0.6rem;font-size:0.76rem;" (click)="applyQuickAdvisorReply(ticket, 'CONSULT_GIFT')">
+              🎁 Tư vấn XANH (Hỗ trợ gói quà cổ phong)
+            </button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:minmax(0, 1fr) auto;gap:0.65rem;align-items:end;">
+            <textarea
+              class="form-control"
+              rows="2"
+              placeholder="Nhập phản hồi của Tư vấn viên để gửi cho khách hàng..."
+              [(ngModel)]="advisorReplyMap[ticket.id]"
+            ></textarea>
+            <button type="button" class="button button--primary" style="height:54px;white-space:nowrap;" (click)="submitAdvisorReply(ticket, 'GREEN')">
+              Gửi phản hồi & Chuyển về Xanh
+            </button>
+          </div>
+        </article>
+      </div>
+    </ng-container>
+  </main>
+</div>

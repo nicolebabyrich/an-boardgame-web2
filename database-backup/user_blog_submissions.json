@@ -1,0 +1,15 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faeabc",
+    "id": 1,
+    "userId": 2,
+    "authorName": "Lê Ngọc Mai",
+    "title": "Ván đầu tiên của nhóm tôi tại Lệ Chi Viên",
+    "excerpt": "Nhóm chúng tôi mất gần hai giờ để phá án, mỗi người đều giữ một giả thuyết riêng.",
+    "content": "Nhóm chúng tôi mất gần hai giờ để phá án. Điều thú vị nhất là mỗi người đều có giả thuyết khác nhau nhưng phải cùng đối chiếu chứng cứ để tìm ra hung thủ thực sự.",
+    "image": "/img/products/14.png",
+    "status": "PENDING",
+    "adminNote": "",
+    "createdAt": "25.06.2026"
+  }
+]

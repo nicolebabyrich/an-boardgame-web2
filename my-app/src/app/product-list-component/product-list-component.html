@@ -1,0 +1,179 @@
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumbs" aria-label="Đường dẫn">
+      <a routerLink="/home">Trang chủ</a><span>/</span><span>Sản phẩm</span>
+    </nav>
+    <p class="eyebrow">Kho lưu trữ</p>
+    <h1>Tất cả sản phẩm</h1>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container catalog-layout">
+    <aside class="catalog-sidebar surface" aria-label="Bộ lọc sản phẩm">
+      <form id="product-filter-form" (ngSubmit)="applyFilter()">
+        <div class="filter-group">
+          <h3>Tìm kiếm</h3>
+          <input
+            class="form-control"
+            type="search"
+            name="search"
+            [(ngModel)]="search"
+            (input)="currentPage = 1"
+            placeholder="Tên sản phẩm..."
+          >
+        </div>
+        <div class="filter-group">
+          <h3>Danh mục</h3>
+          <label *ngFor="let item of store.categories$ | async" class="filter-option">
+            <input
+              type="radio"
+              name="category"
+              [value]="item.id"
+              [(ngModel)]="category"
+              (change)="applyFilter()"
+            >
+            <span>{{ item.name }}</span>
+          </label>
+        </div>
+        <div class="filter-group">
+          <h3>Khoảng giá</h3>
+          <div style="margin-bottom:0.75rem;">
+            <div style="display:flex;justify-content:space-between;font-size:0.84rem;margin-bottom:0.35rem;color:var(--gold-soft);">
+              <span>{{ store.formatCurrency(minPrice) }}</span>
+              <strong>Tối đa: {{ store.formatCurrency(maxPrice) }}</strong>
+            </div>
+            <input
+              type="range"
+              min="0"
+              max="1500000"
+              step="50000"
+              name="maxPriceSlider"
+              [(ngModel)]="maxPrice"
+              (input)="onPriceSliderChange()"
+              style="width:100%;accent-color:#d5b76b;cursor:pointer;"
+              aria-label="Thanh kéo giá tối đa"
+            >
+          </div>
+          <div class="range-row">
+            <label class="form-field">
+              <span class="form-label">Từ</span>
+              <input class="form-control" type="number" min="0" step="50000" name="min" [(ngModel)]="minPrice" (input)="onPriceSliderChange()">
+            </label>
+            <label class="form-field">
+              <span class="form-label">Đến</span>
+              <input class="form-control" type="number" min="0" step="50000" name="max" [(ngModel)]="maxPrice" (input)="onPriceSliderChange()">
+            </label>
+          </div>
+          <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+            <button class="button button--secondary button--small" type="submit">Áp dụng bộ lọc</button>
+            <button class="button button--ghost button--small" type="button" (click)="resetFilter()">Đặt lại</button>
+          </div>
+        </div>
+      </form>
+    </aside>
+
+    <div>
+      <div class="catalog-toolbar">
+        <p>
+          Hiển thị <strong>{{ paginatedProducts.length }}</strong> / <strong>{{ filteredProducts.length }}</strong> sản phẩm
+          (Trang {{ currentPage }}/{{ totalPages }})
+        </p>
+        <div class="catalog-toolbar__controls">
+          <label class="form-field sort-select-field">
+            <span class="form-label">Sắp xếp</span>
+            <select
+              class="form-control product-sort-select"
+              id="product-sort"
+              name="sort"
+              [(ngModel)]="sort"
+              (change)="applyFilter()"
+            >
+              <option value="newest">Mới nhất</option>
+              <option value="price-asc">Giá tăng dần</option>
+              <option value="price-desc">Giá giảm dần</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Thanh phân trang nhanh phía trên (Tab 1, 2, 3...) -->
+      <nav *ngIf="totalPages > 1" aria-label="Phân trang sản phẩm" style="display:flex;align-items:center;gap:0.5rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+        <span class="muted" style="font-size:0.86rem;margin-right:0.25rem;">Chuyển trang:</span>
+        <button
+          *ngFor="let page of pageNumbers"
+          type="button"
+          class="button button--small"
+          [ngClass]="page === currentPage ? 'button--primary' : 'button--ghost'"
+          (click)="goToPage(page)"
+        >
+          Trang {{ page }}
+        </button>
+      </nav>
+
+      <div *ngIf="paginatedProducts.length > 0" class="product-grid">
+        <article *ngFor="let product of paginatedProducts" class="product-card" [attr.data-product-id]="product.id">
+          <a class="product-card__media" [routerLink]="['/products', product.id]" [attr.aria-label]="'Xem ' + product.name">
+            <img [src]="product.images[0]" [alt]="product.name" loading="lazy">
+            <span class="product-card__badge">{{ isSoldOut(product) ? 'Hết hàng' : store.getCategoryName(product.category) }}</span>
+          </a>
+          <div class="product-card__body">
+            <span class="product-card__category">{{ store.getCategoryName(product.category) }}</span>
+            <a class="product-card__title" [routerLink]="['/products', product.id]">{{ product.name }}</a>
+            <div class="price">
+              <span class="price-current">{{ store.formatCurrency(product.discountPrice ?? product.price) }}</span>
+              <span *ngIf="product.discountPrice" class="price-old">{{ store.formatCurrency(product.price) }}</span>
+            </div>
+            <div class="product-card__actions" style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <button *ngIf="isSoldOut(product)" class="button button--ghost button--small" type="button" disabled>Hết hàng</button>
+              <a class="button button--ghost button--small" [routerLink]="['/products', product.id]">Xem chi tiết</a>
+              <button *ngIf="!isSoldOut(product)" class="button button--primary button--small" type="button" (click)="buyNow(product.id)">Mua ngay</button>
+              <button
+                class="button button--secondary button--small button--cart-icon"
+                type="button"
+                (click)="addToCart(product.id)"
+                [disabled]="isSoldOut(product)"
+                [attr.aria-label]="'Thêm ' + product.name + ' vào giỏ'"
+                title="Thêm vào giỏ hàng"
+              >
+                <svg class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.49-.402L1.61 2H.5a.5.5 0 0 1-.5-.5M3.14 4l1.25 6h8.22l1.286-6zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Thanh phân trang phía dưới (Tab 1, 2, 3...) -->
+      <nav *ngIf="totalPages > 1" aria-label="Điều hướng phân trang" style="display:flex;justify-content:center;align-items:center;gap:0.55rem;margin-top:2rem;flex-wrap:wrap;">
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          [disabled]="currentPage <= 1"
+          (click)="goToPage(currentPage - 1)"
+        >← Trước</button>
+        <button
+          *ngFor="let page of pageNumbers"
+          type="button"
+          class="button button--small"
+          [ngClass]="page === currentPage ? 'button--primary' : 'button--secondary'"
+          (click)="goToPage(page)"
+        >{{ page }}</button>
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          [disabled]="currentPage >= totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >Tiếp →</button>
+      </nav>
+
+      <div *ngIf="filteredProducts.length === 0" class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Chưa tìm thấy hồ sơ</h3>
+          <p class="muted">Hãy thử thay đổi từ khóa hoặc kéo thanh khoảng giá rộng hơn.</p>
+          <button class="button button--primary" type="button" (click)="resetFilter()">Xóa bộ lọc</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,595 @@
+<section class="hero" *ngIf="activeHomeSection === 'story'" aria-labelledby="hero-title">
+  <div class="container hero-content">
+    <p class="hero-kicker">Hồ sơ mật sử Đại Việt · Canh Ba Năm Nhâm Tuất (1442)</p>
+    <h1 id="hero-title">Lịch sử chưa bao giờ chỉ có một lời&nbsp;kể.</h1>
+    <p class="hero-lead">
+      Đêm mồng 4 tháng 8 năm 1442 tại Lệ Chi Viên, ngọn đèn ngự dụng vụt tắt. Mở niêm phong mật chỉ, đối chất từng nhân chứng và tự mình phán xét chân tướng bị chôn vùi suốt sáu thế kỷ.
+    </p>
+    <div class="button-row">
+      <button class="button button--primary" type="button" (click)="switchHomeSection('simulation')">
+        🕯️ Bước vào Phòng Án Mô Phỏng
+      </button>
+      <button class="button button--secondary" type="button" (click)="switchHomeSection('characters')">
+        🎭 Mở Hồ sơ 5 Nhân chứng
+      </button>
+      <button class="button button--ghost" type="button" (click)="switchHomeSection('guide')">
+        🧭 Cẩm nang Cách chơi
+      </button>
+    </div>
+    <div class="hero-facts" aria-label="Thông tin nổi bật">
+      <span class="hero-fact"><strong>3-6</strong><span>Quan Điều Tra</span></span>
+      <span class="hero-fact"><strong>90′</strong><span>Một Đêm Thẩm Vấn</span></span>
+      <span class="hero-fact"><strong>13+</strong><span>Độ Tuổi Nhập Vai</span></span>
+      <span class="hero-fact"><strong>01</strong><span>Chân Tướng Ẩn Giấu</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- Vùng neo cuộn nội dung khi chuyển chương mục trên Header -->
+<div id="home-content-anchor"></div>
+
+<!-- ==================== CỤC 1: CỐT TRUYỆN MẬT ÁN & VẬT CHỨNG TRỌNG ĐIỂM ==================== -->
+<ng-container *ngIf="activeHomeSection === 'story'">
+  <section class="section">
+    <div class="container intro-grid">
+      <div>
+        <p class="eyebrow">Khởi nguyên Mật&nbsp;Án - Đêm Lệ&nbsp;Chi&nbsp;Viên (1442)</p>
+        <h2>Khi ngọn đèn Đông&nbsp;Các vụt&nbsp;tắt giữa canh&nbsp;ba</h2>
+        <p>
+          <strong>Biến cố lịch sử:</strong> Mùa thu năm Nhâm&nbsp;Tuất (1442), đoàn ngự&nbsp;giá dừng chân tại <em>Lệ&nbsp;Chi&nbsp;Viên</em> bên dòng Thiên&nbsp;Đức. Chỉ một khắc sau tuần trà an&nbsp;thần, Tiên&nbsp;Đế băng&nbsp;hà đột ngột. Cấm&nbsp;quân lập tức phong tỏa toàn bộ hành&nbsp;cung, biến tất cả những người có mặt đêm đó thành nghi&nbsp;phạm.
+        </p>
+        <p class="muted">
+          <strong>Trải nghiệm Tàng Thư Các:</strong> Bước vào thế giới của <em>ẨN</em>, bạn không đọc lại lịch sử thụ động mà trực tiếp cầm ấn Đại&nbsp;Lý&nbsp;Tự, khảo cứu vật&nbsp;chứng dưới ba tầng trải nghiệm:
+        </p>
+        <div class="value-list">
+          <div class="value-item"><span class="value-number">01</span><div><h3>Tương&nbsp;tác mô&nbsp;hình 3D xoay&nbsp;360°</h3><p class="muted">Soi từng vết&nbsp;nứt trên chén ngự&nbsp;trà, ấn&nbsp;chương và chân&nbsp;dung 5 nhân&nbsp;vật lịch&nbsp;sử từ mọi góc&nbsp;độ ngay trên trình&nbsp;duyệt.</p></div></div>
+          <div class="value-item"><span class="value-number">02</span><div><h3>Trợ&nbsp;lý AI Thư&nbsp;Đồng phân&nbsp;tích cảm&nbsp;xúc</h3><p class="muted">Thư&nbsp;Đồng coi sóc Tàng&nbsp;Thư&nbsp;Các giúp tra&nbsp;cứu hồ&nbsp;sơ vụ&nbsp;án, đồng thời lắng&nbsp;nghe tâm&nbsp;trạng và kết&nbsp;nối Tư&nbsp;vấn&nbsp;viên tức&nbsp;thì.</p></div></div>
+          <div class="value-item"><span class="value-number">03</span><div><h3>Cơ&nbsp;chế giữ&nbsp;chỗ &amp; Đặt&nbsp;hàng vãng&nbsp;lai OTP</h3><p class="muted">Niêm&nbsp;phong giữ&nbsp;chỗ vật&nbsp;phẩm 15&nbsp;phút khi thỉnh hồ&nbsp;sơ, hỗ&nbsp;trợ khách&nbsp;vãng&nbsp;lai nhận mật&nbsp;mã OTP bảo&nbsp;mật.</p></div></div>
+        </div>
+        <div class="button-row" style="margin-top:1.35rem;">
+          <button class="button button--primary" type="button" (click)="switchHomeSection('simulation')" style="white-space:nowrap;padding:0.75rem 1.4rem;font-weight:700;">
+            🕯️ Vào Phòng Án Chơi Thử Ngay &rarr;
+          </button>
+          <button class="button button--secondary" type="button" (click)="switchHomeSection('characters')" style="white-space:nowrap;padding:0.75rem 1.4rem;font-weight:700;">
+            🎭 Xem Hồ Sơ 5 Nhân Chứng
+          </button>
+        </div>
+      </div>
+      <div class="intro-visual">
+        <img src="/img/products/9.png" alt="Standee dàn nhân vật ẨN Store" loading="lazy">
+        <aside class="visual-note"><strong>“Mỗi nhân chứng giữ một mảnh sự thật.”</strong><p class="muted">- Biên bản mật lưu trữ số 1442</p></aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container story-grid">
+      <div class="story-visual">
+        <img src="/img/products/23.png" alt="Board game ẨN: Mật Án Lệ Chi Viên" loading="lazy">
+      </div>
+      <div>
+        <p class="eyebrow">Hồ sơ trọng điểm</p>
+        <h2>ẨN: Mật Án Lệ Chi Viên</h2>
+        <p>Sáu mươi lá bài chứng cứ, năm tập hồ sơ nhân chứng với những lời khai mâu thuẫn chồng chéo. Trong đêm định mệnh ấy, ai là người dâng chén trà độc, ai là kẻ đốt mật thư dưới chân đèn?</p>
+        <p class="muted">Bạn phải đọc thấu động cơ, lựa chọn đồng minh đáng tin và bảo vệ bản án văn của mình trước những điều tra viên khác trên bàn tròn.</p>
+        <div class="product-specs">
+          <div class="spec-item"><span>Bối cảnh</span><strong>Đại Việt năm 1442</strong></div>
+          <div class="spec-item"><span>Cơ chế</span><strong>Suy luận &amp; Ẩn vai</strong></div>
+          <div class="spec-item"><span>Bàn chơi</span><strong>3-6 Điều tra viên</strong></div>
+          <div class="spec-item"><span>Độ khó</span><strong>Bậc Đại Lý Tự</strong></div>
+        </div>
+        <div class="button-row story-action-row" style="display:flex;align-items:center;gap:0.75rem;flex-wrap:nowrap;margin-top:1.5rem;width:100%;">
+          <a class="button button--primary" [routerLink]="['/products', 1]" style="white-space:nowrap;flex:1;text-align:center;padding:0.75rem 1rem;font-size:0.92rem;font-weight:700;">
+            Thỉnh bộ hồ sơ gốc
+          </a>
+          <button class="button button--secondary" type="button" (click)="switchHomeSection('guide')" style="white-space:nowrap;flex:1;text-align:center;padding:0.75rem 1rem;font-size:0.92rem;font-weight:700;">
+            Xem Cẩm nang Cách chơi
+          </button>
+          <button class="button button--ghost" type="button" (click)="addToCart(1)" style="white-space:nowrap;flex:1;text-align:center;padding:0.75rem 1rem;font-size:0.92rem;font-weight:700;">
+            Thêm vào hành trang
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Tàng thư vật phẩm</p>
+          <h2>Ấn phẩm nổi bật từ vụ&nbsp;án</h2>
+          <p>Những bộ hồ sơ và kỷ vật được chế tác cho cuộc điều tra đầu tiên của bạn.</p>
+        </div>
+        <a class="button button--secondary" routerLink="/products">Mở toàn bộ Tàng Thư Các</a>
+      </div>
+      <div class="product-grid">
+        <article *ngFor="let product of featuredProducts" class="product-card" [attr.data-product-id]="product.id">
+          <a class="product-card__media" [routerLink]="['/products', product.id]" [attr.aria-label]="'Xem ' + product.name">
+            <img [src]="product.images[0]" [alt]="product.name" loading="lazy">
+            <span class="product-card__badge">{{ isSoldOut(product) ? 'Hết hàng' : store.getCategoryName(product.category) }}</span>
+          </a>
+          <div class="product-card__body">
+            <span class="product-card__category">{{ store.getCategoryName(product.category) }}</span>
+            <a class="product-card__title" [routerLink]="['/products', product.id]">{{ product.name }}</a>
+            <div class="price">
+              <span class="price-current">{{ store.formatCurrency(product.discountPrice ?? product.price) }}</span>
+              <span *ngIf="product.discountPrice" class="price-old">{{ store.formatCurrency(product.price) }}</span>
+            </div>
+            <div class="product-card__actions" style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+              <button *ngIf="isSoldOut(product)" class="button button--ghost button--small" type="button" disabled>Hết hàng</button>
+              <a class="button button--ghost button--small" [routerLink]="['/products', product.id]">Xem chi tiết</a>
+              <button *ngIf="!isSoldOut(product)" class="button button--primary button--small" type="button" (click)="buyNow(product.id)">Mua ngay</button>
+              <button
+                class="button button--secondary button--small button--cart-icon"
+                type="button"
+                (click)="addToCart(product.id)"
+                [disabled]="isSoldOut(product)"
+                [attr.aria-label]="'Thêm ' + product.name + ' vào giỏ'"
+                title="Thêm vào giỏ hàng"
+              >
+                <svg class="bi bi-cart3" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1.5 7A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.49-.402L1.61 2H.5a.5.5 0 0 1-.5-.5M3.14 4l1.25 6h8.22l1.286-6zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"/></svg>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<!-- ==================== CỤC 2: PHÒNG ÁN MÔ PHỎNG (CHƠI THỬ TƯƠNG TÁC) ==================== -->
+<ng-container *ngIf="activeHomeSection === 'simulation'">
+  <section class="section" id="mini-game-le-chi-vien">
+    <div class="container">
+      <div class="crime-room-shell">
+        <div class="crime-room-topbar">
+          <div>
+            <p class="eyebrow" style="margin-bottom:0.25rem;">Mô phỏng Hiện trường Nhập vai</p>
+            <h2 style="margin:0 0 0.25rem;font-size:clamp(1.3rem,2.2vw,1.8rem);">Hiện Trường Tẩm Điện Lệ Chi Viên (Canh Ba · 1442)</h2>
+            <p class="muted" style="margin:0;font-size:0.86rem;">
+              Chạm vào <strong>các điểm sáng vật chứng</strong> và <strong>nhân vật mini trong căn phòng</strong> để nghe lời khai, thu thập manh mối và vạch mặt hung thủ!
+            </p>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:0.45rem;flex-wrap:wrap;">
+            <button
+              type="button"
+              (click)="resetMiniGame()"
+              style="padding:0.36rem 0.8rem;border-radius:999px;font-size:0.75rem;font-weight:700;border:1px solid rgba(213,183,107,0.5);cursor:pointer;"
+              [style.background]="miniGameStep === 1 ? 'var(--color-gold-soft)' : 'rgba(213,183,107,0.12)'"
+              [style.color]="miniGameStep === 1 ? '#1e0e0c' : '#f3ead6'"
+            >
+              Màn 1 · Lần mò phòng án ({{ inspectedClueIds.size }}/3)
+            </button>
+            <span style="opacity:0.45;">&rarr;</span>
+            <span
+              style="padding:0.36rem 0.8rem;border-radius:999px;font-size:0.75rem;font-weight:700;border:1px solid rgba(213,183,107,0.5);"
+              [style.background]="miniGameStep === 2 ? 'var(--color-gold-soft)' : 'rgba(213,183,107,0.12)'"
+              [style.color]="miniGameStep === 2 ? '#1e0e0c' : '#f3ead6'"
+            >
+              Màn 2 · Thẩm vấn nhân vật
+            </span>
+            <span style="opacity:0.45;">&rarr;</span>
+            <span
+              style="padding:0.36rem 0.8rem;border-radius:999px;font-size:0.75rem;font-weight:700;border:1px solid rgba(213,183,107,0.5);"
+              [style.background]="miniGameStep === 3 ? '#89b96f' : 'rgba(255,244,218,0.06)'"
+              [style.color]="miniGameStep === 3 ? '#102214' : 'rgba(243,234,214,0.65)'"
+            >
+              Màn 3 · Kết án &amp; Mở thưởng
+            </span>
+          </div>
+        </div>
+
+        <div class="crime-room-stage">
+          <div class="room-hud-bar">
+            <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;">
+              <span class="status-badge status-badge--warning">
+                {{ miniGameStep === 1 ? '📍 MÀN 1: KHÁM NGHIỆM PHÒNG TẨM ĐIỆN' : (miniGameStep === 2 ? '🕯️ MÀN 2: ĐỐI CHẤT NGHI PHẠM TRONG PHÒNG' : '⚖️ MÀN 3: HẠ MÀN PHÁ ÁN') }}
+              </span>
+              <span style="font-size:0.82rem;color:#f3ead6;">
+                <ng-container *ngIf="miniGameStep === 1">
+                  Bấm vào 3 vị trí trong căn phòng (<strong>Chân đèn đồng</strong>, <strong>Bàn trà</strong>, <strong>Rèm lụa</strong>) để nhân vật mini hiện lên dẫn đường.
+                </ng-container>
+                <ng-container *ngIf="miniGameStep === 2 && selectedClue as clue">
+                  Manh mối đang cầm trên tay: <strong style="color:var(--color-gold-soft);">[{{ clue.icon }} {{ clue.title }}]</strong> - Hãy chạm vào từng nghi phạm trong phòng để chất vấn!
+                </ng-container>
+                <ng-container *ngIf="miniGameStep === 3 && selectedSuspect as suspect">
+                  Đã khóa mục tiêu tại hiện trường: <strong style="color:var(--color-gold-soft);">{{ suspect.name }}</strong>
+                </ng-container>
+              </span>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;">
+              <span
+                *ngFor="let c of clueOptions"
+                (click)="miniGameStep === 1 ? inspectClueInRoom(c.id) : null"
+                style="padding:0.24rem 0.6rem;border-radius:999px;font-size:0.72rem;border:1px solid rgba(213,183,107,0.35);cursor:pointer;"
+                [style.background]="isClueInspected(c.id) ? 'rgba(137,185,111,0.2)' : 'rgba(255,255,255,0.05)'"
+                [style.color]="isClueInspected(c.id) ? '#b8e994' : 'rgba(243,234,214,0.65)'"
+              >
+                {{ isClueInspected(c.id) ? '✓ ' : '🔍 ' }}{{ c.spotLabel }}
+              </span>
+            </div>
+          </div>
+
+          <div class="room-canvas-area">
+            <ng-container *ngIf="miniGameStep === 1">
+              <div
+                *ngFor="let clue of clueOptions"
+                class="room-node"
+                [class.is-active]="activeRoomClue.id === clue.id"
+                [style.left]="clue.roomX"
+                [style.top]="clue.roomY"
+                (click)="inspectClueInRoom(clue.id)"
+              >
+                <div class="room-speech-bubble" *ngIf="activeRoomClue.id === clue.id">
+                  {{ clue.npcBubble }}
+                </div>
+
+                <div class="room-mini-character">
+                  <img [src]="clue.npcAvatar" [alt]="clue.npcName">
+                  <div class="room-mini-character__meta">
+                    <strong>{{ clue.npcName }}</strong>
+                    <small>{{ clue.location }}</small>
+                  </div>
+                </div>
+
+                <button type="button" class="room-hotspot-btn">
+                  <span>{{ clue.icon }}</span>
+                  <span>{{ clue.spotLabel }}</span>
+                  <span *ngIf="isClueInspected(clue.id)" class="room-hotspot-dot" title="Đã khám nghiệm"></span>
+                </button>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="miniGameStep === 2">
+              <div
+                *ngFor="let suspect of suspectOptions"
+                class="room-node"
+                [class.is-active]="activeRoomSuspect.id === suspect.id"
+                [style.left]="suspect.roomX"
+                [style.top]="suspect.roomY"
+                (click)="interrogateSuspectInRoom(suspect.id)"
+              >
+                <div class="room-speech-bubble">
+                  {{ suspect.bubbleShort }}
+                </div>
+
+                <div class="room-suspect-figure">
+                  <img [src]="suspect.avatar" [alt]="suspect.name">
+                  <strong style="font-size:0.82rem;color:var(--color-gold-soft);">{{ suspect.name }}</strong>
+                  <small style="font-size:0.68rem;color:rgba(243,234,214,0.75);margin-bottom:0.35rem;">{{ suspect.role }}</small>
+                  <span
+                    style="padding:0.2rem 0.6rem;border-radius:999px;font-size:0.7rem;font-weight:700;"
+                    [style.background]="activeRoomSuspect.id === suspect.id ? 'var(--color-gold)' : 'rgba(255,255,255,0.08)'"
+                    [style.color]="activeRoomSuspect.id === suspect.id ? '#1c080a' : '#f3ead6'"
+                  >
+                    {{ activeRoomSuspect.id === suspect.id ? 'Đang thẩm vấn' : 'Chạm để hỏi cung' }}
+                  </span>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="miniGameStep === 3 && selectedSuspect as finalSuspect">
+              <div
+                class="room-node is-active"
+                style="left:50%;top:48%;"
+              >
+                <div class="room-speech-bubble" style="max-width:340px;font-size:0.82rem;border-color:#d95836;">
+                  {{ finalSuspect.confessionBubble }}
+                </div>
+                <div class="room-suspect-figure" style="border-color:#d95836;box-shadow:0 0 0 10px rgba(217,88,54,0.25), 0 18px 40px rgba(0,0,0,0.8);">
+                  <img [src]="finalSuspect.avatar" [alt]="finalSuspect.name" style="width:78px;height:78px;border-color:#d95836;">
+                  <span class="status-badge status-badge--danger" style="margin-bottom:0.25rem;">ĐÃ BỊ VẠCH MẶT TẠI TẨM ĐIỆN</span>
+                  <strong style="font-size:0.95rem;color:var(--color-gold-soft);">{{ finalSuspect.name }}</strong>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+
+          <!-- HỘP THOẠI MÀN 1 -->
+          <div class="room-vn-box" *ngIf="miniGameStep === 1 && activeRoomClue as clue">
+            <div class="room-vn-grid">
+              <div class="room-vn-portrait">
+                <img [src]="clue.npcAvatar" [alt]="clue.npcName">
+                <span class="room-vn-portrait__badge">{{ clue.npcName }}</span>
+                <small class="muted" style="font-size:0.68rem;margin-top:0.25rem;">{{ clue.npcRole }}</small>
+              </div>
+
+              <div>
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.35rem;">
+                  <span class="status-badge status-badge--warning">{{ clue.code }} · {{ clue.icon }} {{ clue.title }}</span>
+                  <small class="muted" style="font-size:0.76rem;">📍 {{ clue.location }}</small>
+                </div>
+                <p style="margin:0 0 0.5rem;font-size:0.92rem;line-height:1.5;color:#fff4da;font-style:italic;">
+                  {{ clue.npcDialogue }}
+                </p>
+                <div style="padding:0.55rem 0.75rem;border-radius:8px;background:rgba(213,183,107,0.12);border-left:3px solid var(--color-gold-soft);font-size:0.82rem;color:#e8c468;">
+                  <strong>🔍 Giám định hiện trường:</strong> {{ clue.forensicNote }}
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:0.5rem;min-width:220px;">
+                <button
+                  class="button button--primary button--small"
+                  type="button"
+                  style="width:100%;justify-content:center;"
+                  (click)="selectClueAndProceed(clue.id)"
+                >
+                  Chốt vật chứng &amp; Thẩm vấn &rarr;
+                </button>
+                <div style="display:flex;gap:0.35rem;justify-content:center;flex-wrap:wrap;">
+                  <button
+                    *ngFor="let item of clueOptions"
+                    type="button"
+                    class="button button--ghost button--small"
+                    style="padding:0.25rem 0.55rem;font-size:0.72rem;"
+                    [style.borderColor]="item.id === clue.id ? 'var(--color-gold)' : ''"
+                    (click)="inspectClueInRoom(item.id)"
+                  >
+                    {{ item.icon }} {{ item.spotLabel }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HỘP THOẠI MÀN 2 -->
+          <div class="room-vn-box" *ngIf="miniGameStep === 2 && activeRoomSuspect as suspect">
+            <div class="room-vn-grid">
+              <div class="room-vn-portrait">
+                <img [src]="suspect.avatar" [alt]="suspect.name">
+                <span class="room-vn-portrait__badge">{{ suspect.name }}</span>
+                <small class="muted" style="font-size:0.68rem;margin-top:0.25rem;">Nghi phạm trong phòng</small>
+              </div>
+
+              <div>
+                <div style="margin-bottom:0.45rem;padding:0.5rem 0.75rem;border-radius:8px;background:rgba(255,255,255,0.05);font-size:0.84rem;color:#f3ead6;">
+                  <strong style="color:var(--color-gold-soft);">⚖️ Bạn (Điều Tra Viên) đập bàn hỏi:</strong>
+                  <span style="margin-left:0.35rem;">{{ suspect.detectiveQuestion }}</span>
+                </div>
+                <p style="margin:0 0 0.45rem;font-size:0.9rem;color:#ffd8a8;font-style:italic;">
+                  <strong>{{ suspect.name }}:</strong> {{ suspect.suspectReaction }}
+                </p>
+                <div style="font-size:0.8rem;color:#89b96f;">
+                  <strong>💡 Sơ hở đã lộ:</strong> {{ suspect.contradiction }}
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:0.5rem;min-width:225px;">
+                <button
+                  class="button button--primary button--small"
+                  type="button"
+                  style="width:100%;justify-content:center;"
+                  (click)="selectSuspectAndConclude(suspect.id)"
+                >
+                  ⚡ Chỉ định {{ suspect.name }} là Hung Thủ!
+                </button>
+                <button
+                  class="button button--ghost button--small"
+                  type="button"
+                  style="width:100%;justify-content:center;"
+                  (click)="miniGameStep = 1"
+                >
+                  &larr; Quay lại tìm vật chứng trong phòng
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- HỘP THOẠI MÀN 3 -->
+          <div class="room-vn-box" *ngIf="miniGameStep === 3 && deductionVerdict as verdict">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.15rem;align-items:center;">
+              <div>
+                <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.4rem;">
+                  <span class="status-badge status-badge--success">{{ verdict.badge }}</span>
+                  <span class="status-badge status-badge--warning">{{ verdict.accuracy }}</span>
+                </div>
+                <h3 style="margin:0 0 0.4rem;font-size:1.12rem;color:var(--color-gold-soft);">{{ verdict.rankTitle }}</h3>
+                <p style="margin:0 0 0.5rem;font-size:0.86rem;line-height:1.5;">{{ verdict.analysis }}</p>
+                <p style="margin:0;padding:0.55rem 0.75rem;border-radius:8px;background:rgba(217,88,54,0.16);border-left:3px solid #d95836;font-size:0.82rem;color:#f3ead6;">
+                  <strong>🔥 Cú Twist trong hộp Board Game:</strong> {{ verdict.twist }}
+                </p>
+              </div>
+
+              <div style="padding:1rem;border-radius:12px;background:rgba(12,28,22,0.75);border:1px dashed rgba(213,183,107,0.7);text-align:center;">
+                <span style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-gold-soft);">🎁 Rương Thưởng Điều Tra Viên</span>
+                <div style="display:flex;align-items:center;justify-content:center;gap:0.65rem;margin:0.55rem 0 0.75rem;">
+                  <strong style="font-family:var(--font-display);font-size:1.35rem;color:var(--color-gold-soft);letter-spacing:0.08em;">AN10</strong>
+                  <button class="button button--secondary button--small" type="button" (click)="copyVoucher('AN10')">Sao chép mã</button>
+                </div>
+                <div class="button-row" style="justify-content:center;">
+                  <button class="button button--primary button--small" type="button" (click)="buyNow(1)">Mua bộ Full 60 lá bài</button>
+                  <button class="button button--ghost button--small" type="button" (click)="resetMiniGame()">Chơi lại khám phá phòng</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<!-- ==================== CỤC 3: HỒ SƠ 5 NHÂN CHỨNG TRỌNG YẾU & MÔ HÌNH 3D ==================== -->
+<ng-container *ngIf="activeHomeSection === 'characters'">
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Danh sách triệu tập đêm Canh Ba</p>
+          <h2>Hồ sơ nhân chứng: Mật&nbsp;Án Lệ&nbsp;Chi&nbsp;Viên</h2>
+          <p>Năm con người có mặt gần long sàng nhất đêm mồng 4 tháng 8. Chạm vào từng thẻ bài để đọc lời khai mật, xoay tượng 3D và đối chiếu vật phẩm liên quan.</p>
+        </div>
+        <button
+          class="button button--primary"
+          type="button"
+          (click)="switchHomeSection('simulation')"
+          style="white-space:nowrap !important;flex-shrink:0;min-width:max-content;padding:0.75rem 1.4rem;font-size:0.95rem;font-weight:700;"
+        >
+          <span>🕯️ Thẩm vấn ngay trong Phòng&nbsp;Án &rarr;</span>
+        </button>
+      </div>
+      <div class="character-carousel">
+        <button
+          *ngFor="let item of characterProfiles; let i = index"
+          class="character-card"
+          type="button"
+          (click)="openCharacterProfile(item)"
+        >
+          <img [src]="item.image" [alt]="item.title" loading="lazy">
+          <span>Hồ sơ mật số 0{{ i + 1 }}</span>
+          <strong [innerHTML]="item.displayTitle"></strong>
+          <small>Khui niêm phong &amp; Xoay 3D</small>
+        </button>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<!-- ==================== CỤC 4: CẨM NANG CÁCH CHƠI (4 HỒI ĐIỀU TRA ĐẠI LÝ TỰ) ==================== -->
+<ng-container *ngIf="activeHomeSection === 'guide'">
+  <section class="section">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Nghi thức Thẩm án trên bàn tròn · 3-6 Người chơi</p>
+          <h2>Cẩm nang phá&nbsp;án: Bốn&nbsp;hồi lật&nbsp;mở chân&nbsp;tướng</h2>
+          <p class="muted">Không cần đọc luật dài dòng - mỗi ván chơi ẨN diễn ra như một đêm xét hỏi thực thụ tại Đông Các qua 4 hồi gay cấn:</p>
+        </div>
+        <button
+          class="button button--primary"
+          type="button"
+          (click)="switchHomeSection('simulation')"
+          style="white-space:nowrap !important;flex-shrink:0;min-width:max-content;padding:0.75rem 1.4rem;font-size:0.95rem;font-weight:700;"
+        >
+          <span>🕯️&nbsp;Tập&nbsp;sự&nbsp;phá&nbsp;án&nbsp;ngay&nbsp;&rarr;</span>
+        </button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.15rem;margin-bottom:2rem;">
+        <article
+          *ngFor="let step of howToPlaySteps"
+          class="surface"
+          style="padding:1.45rem;border:1px solid rgba(213,183,107,0.32);background:rgba(255,244,218,0.035);display:flex;flex-direction:column;gap:0.75rem;"
+        >
+          <span class="status-badge status-badge--warning" style="align-self:flex-start;">{{ step.act }}</span>
+          <h3 style="margin:0;font-size:1.18rem;line-height:1.55;letter-spacing:0.02em;color:var(--color-gold-soft);font-family:var(--font-display);" [innerHTML]="step.title"></h3>
+          <p class="muted" style="margin:0;font-size:0.92rem;line-height:1.75;letter-spacing:0.015em;">{{ step.desc }}</p>
+        </article>
+      </div>
+
+      <div class="surface" style="padding:1.6rem;border:1px solid rgba(213,183,107,0.38);background:radial-gradient(circle at top left, rgba(213,183,107,0.12), rgba(20,7,7,0.92));">
+        <p class="eyebrow" style="margin-bottom:0.3rem;">Cơ chế Ẩn vai &amp; Đấu trí tâm lý</p>
+        <h3 style="margin:0 0 1rem;font-size:1.35rem;">Ba Phe Phái Bí Mật Trên Bàn Chơi</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;">
+          <div
+            *ngFor="let fac of secretFactions"
+            style="padding:1rem 1.15rem;border-radius:12px;background:rgba(0,0,0,0.38);border-left:3px solid var(--color-gold);"
+          >
+            <span style="font-size:0.72rem;font-weight:800;letter-spacing:0.08em;color:var(--color-gold-soft);display:block;margin-bottom:0.25rem;">{{ fac.badge }}</span>
+            <strong style="font-size:1.05rem;display:block;margin-bottom:0.35rem;color:#fff4da;">{{ fac.name }}</strong>
+            <p class="muted" style="margin:0;font-size:0.86rem;line-height:1.5;">{{ fac.goal }}</p>
+          </div>
+        </div>
+        <div class="button-row" style="margin-top:1.35rem;">
+          <a class="button button--primary" [routerLink]="['/products', 1]">Thỉnh bộ Board Game đầy đủ</a>
+          <button class="button button--secondary" type="button" (click)="switchHomeSection('simulation')">Chơi thử Phòng Án Mô Phỏng</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<!-- ==================== CỤC 5: MẬT LỆNH ƯU ĐÃI & BIÊN BẢN PHÒNG LƯU TRỮ ==================== -->
+<ng-container *ngIf="activeHomeSection === 'offers'">
+  <section class="section">
+    <div class="container">
+      <article class="promotion-banner">
+        <div class="promotion-copy">
+          <p class="eyebrow">Mật lệnh ban thưởng tháng này</p>
+          <h2>Giảm 10% cho cuộc điều&nbsp;tra đầu&nbsp;tiên</h2>
+          <p>Áp dụng khi thỉnh hồ sơ từ 500.000 ₫. Mỗi danh tính Điều tra viên được sử dụng mật lệnh 01 lần duy nhất, giảm tối đa 150.000 ₫.</p>
+          <div style="display:inline-flex;align-items:stretch;border:1px dashed rgba(213,183,107,0.65);border-radius:10px;background:rgba(12,28,22,0.55);overflow:hidden;margin:0.65rem 0 1.1rem;max-width:100%;">
+            <div style="padding:0.65rem 1.25rem;display:flex;flex-direction:column;justify-content:center;border-right:1px dashed rgba(213,183,107,0.4);">
+              <span style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.12em;color:rgba(243,234,214,0.7);">Ấn tín ưu đãi độc quyền</span>
+              <strong style="font-family:var(--font-display);font-size:1.65rem;line-height:1.1;color:var(--color-gold-soft);letter-spacing:0.06em;">AN10</strong>
+            </div>
+            <button
+              type="button"
+              (click)="copyVoucher('AN10')"
+              style="border:none;background:rgba(213,183,107,0.16);color:var(--color-gold-soft);padding:0 1.25rem;font-weight:700;font-size:0.86rem;cursor:pointer;display:inline-flex;align-items:center;gap:0.45rem;transition:background 0.2s;"
+            >
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
+              <span>Sao chép mật lệnh</span>
+            </button>
+          </div>
+          <div><a class="button button--primary" routerLink="/products">Mở Tàng Thư Vật Phẩm</a></div>
+        </div>
+        <div class="promotion-visual"><img src="/img/products/20.png" alt="Combo Sơ Khởi của ẨN Store" loading="lazy"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section section--paper">
+    <div class="container">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Biên bản &amp; Giai thoại cổ sử</p>
+          <h2>Từ phòng lưu&nbsp;trữ Đông&nbsp;Các</h2>
+          <p>Những ghi chép hậu trường về lịch sử triều Lê sơ, nghệ thuật chế tác và tâm lý học tội phạm.</p>
+        </div>
+        <a class="button button--secondary" routerLink="/blog">Đọc toàn bộ biên bản</a>
+      </div>
+      <div class="blog-grid">
+        <article *ngFor="let post of publishedBlogs" class="blog-card">
+          <img [src]="post.image" [alt]="post.title" loading="lazy">
+          <div class="blog-card__body">
+            <time>{{ store.formatDate(post.date) }}</time>
+            <h3>{{ post.title }}</h3>
+            <p class="muted">{{ post.excerpt }}</p>
+            <a class="nav-link" routerLink="/blog">Mở biên bản →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container newsletter">
+      <div>
+        <p class="eyebrow">Bồ câu đưa mật thư</p>
+        <h2 class="newsletter-title"><span>Án văn mới sẽ được gửi</span><span>đến trước khi</span><span>niêm phong.</span></h2>
+        <p class="muted">Để lại địa chỉ thư tín để nhận mật lệnh phát hành vụ án mới và ấn phẩm giới hạn.</p>
+      </div>
+      <form class="newsletter-form" id="newsletter-form" (ngSubmit)="submitNewsletter()" novalidate>
+        <label class="form-field">
+          <span class="form-label">Địa chỉ nhận mật thư</span>
+          <input
+            class="form-control"
+            [class.has-error]="newsletterError"
+            type="email"
+            name="email"
+            [(ngModel)]="newsletterEmail"
+            (input)="validateNewsletterEmail(false)"
+            (blur)="validateNewsletterEmail(true)"
+            placeholder="thamtu@example.com"
+            required
+          >
+        </label>
+        <button class="button button--primary" type="submit" [disabled]="newsletterSubmitting">
+          {{ newsletterSubmitting ? 'Đang đóng ấn...' : 'Ghi danh' }}
+        </button>
+        <small *ngIf="newsletterError" class="field-error form-field--full" role="alert">{{ newsletterError }}</small>
+        <p
+          *ngIf="newsletterMessage"
+          class="form-message form-field--full"
+          [class.form-message--success]="!newsletterError && newsletterMessage"
+          id="newsletter-message"
+          aria-live="polite"
+        >{{ newsletterMessage }}</p>
+      </form>
+    </div>
+  </section>
+</ng-container>

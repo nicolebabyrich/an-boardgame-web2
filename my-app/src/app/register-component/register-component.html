@@ -1,0 +1,152 @@
+<section class="auth-shell">
+  <div class="auth-visual" aria-hidden="true">
+    <img src="/img/products/23.png" alt="">
+  </div>
+  <div class="auth-panel">
+    <div class="auth-card">
+      <p class="eyebrow">Thành viên mới</p>
+      <h1>Gia nhập mạng lưới điều tra</h1>
+      <p class="muted" style="font-size:0.82rem;margin-bottom:0.85rem;">
+        Các trường đánh dấu <span style="color:#ef4444;font-weight:700;">*</span> là bắt buộc. Hỗ trợ tên ngắn (2-3 ký tự) hoặc tên nước ngoài.
+      </p>
+
+      <form id="register-form" class="form-grid" novalidate (ngSubmit)="onSubmit()">
+        <label class="form-field form-field--full">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Họ và tên / Biệt danh (từ 2 ký tự) <span style="color:#ef4444;font-weight:700;">*</span>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['fullName']"
+            name="fullName"
+            autocomplete="name"
+            minlength="2"
+            maxlength="100"
+            placeholder="VD: An, Lee, hoặc Nguyễn Văn An"
+            required
+            [(ngModel)]="fullName"
+            (input)="validateField('fullName', false)"
+            (blur)="validateField('fullName', true)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['fullName']">{{ errors['fullName'] }}</small>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Email <span style="color:#ef4444;font-weight:700;">*</span>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['email']"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="ban@example.com"
+            required
+            [(ngModel)]="email"
+            (input)="validateField('email', false)"
+            (blur)="validateField('email', true)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['email']">{{ errors['email'] }}</small>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Số điện thoại <span style="color:#ef4444;font-weight:700;">*</span>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['phone']"
+            name="phone"
+            autocomplete="tel"
+            inputmode="numeric"
+            maxlength="10"
+            pattern="0[35789][0-9]{8}"
+            placeholder="0901234567"
+            required
+            [(ngModel)]="phone"
+            (input)="validateField('phone', false)"
+            (blur)="validateField('phone', true)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['phone']">{{ errors['phone'] }}</small>
+        </label>
+
+        <label class="form-field form-field--full">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Ngày sinh <small class="muted">(Tùy chọn, từ 13 tuổi)</small>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['dateOfBirth']"
+            type="date"
+            name="dateOfBirth"
+            [max]="maxBirthDate"
+            [(ngModel)]="dateOfBirth"
+            (change)="validateField('dateOfBirth', true)"
+            (blur)="validateField('dateOfBirth', false)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['dateOfBirth']">{{ errors['dateOfBirth'] }}</small>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Mật khẩu <span style="color:#ef4444;font-weight:700;">*</span>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['password']"
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            minlength="6"
+            placeholder="Tối thiểu 6 ký tự"
+            required
+            [(ngModel)]="password"
+            (input)="validateField('password', false)"
+            (blur)="validateField('password', true)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['password']">{{ errors['password'] }}</small>
+        </label>
+
+        <label class="form-field">
+          <span class="form-label" style="color:var(--gold-soft);">
+            Nhập lại mật khẩu <span style="color:#ef4444;font-weight:700;">*</span>
+          </span>
+          <input
+            class="form-control"
+            [class.has-error]="errors['confirmPassword']"
+            type="password"
+            name="confirmPassword"
+            autocomplete="new-password"
+            placeholder="Nhập lại đúng mật khẩu"
+            required
+            [(ngModel)]="confirmPassword"
+            (input)="validateField('confirmPassword', false)"
+            (blur)="validateField('confirmPassword', true)"
+          >
+          <small class="field-error" style="color:#f87171;" role="alert" *ngIf="errors['confirmPassword']">{{ errors['confirmPassword'] }}</small>
+          <small *ngIf="!errors['confirmPassword'] && passwordsMatch" style="color:#4ade80;font-size:0.8rem;">
+            ✓ Hai mật khẩu đã trùng khớp.
+          </small>
+        </label>
+
+        <p class="form-message form-field--full" style="color:#f87171;" id="auth-message">{{ authMessage }}</p>
+        <button class="button button--primary form-field--full" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Đang khởi tạo...' : 'ĐĂNG KÝ TÀI KHOẢN' }}
+        </button>
+      </form>
+
+      <!-- Tách khoảng cách rõ ràng giữa "Đã có tài khoản?" và "Đăng nhập" với thiết kế thẻ CTA đồng bộ (Bug #7) -->
+      <div class="auth-divider">
+        <span>Đã có hồ sơ điều tra viên?</span>
+      </div>
+      <a class="auth-login-cta" routerLink="/login">
+        <div>
+          <strong style="display:block;color:#f4d993;font-size:0.92rem;">Đã có tài khoản? - Đăng nhập ngay</strong>
+          <small class="muted" style="font-size:0.76rem;">Mở lại hồ sơ bằng mật khẩu hoặc quét mã QR tự động</small>
+        </div>
+        <span style="color:#f4d993;font-weight:700;font-size:1.1rem;">→</span>
+      </a>
+    </div>
+  </div>
+</section>

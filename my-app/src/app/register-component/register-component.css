@@ -1,0 +1,39 @@
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.25rem 0 0.9rem;
+  color: rgba(255, 244, 218, 0.6);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(213, 183, 107, 0.38), transparent);
+}
+
+.auth-login-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.8rem 1.05rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(213, 183, 107, 0.14) 0%, rgba(155, 111, 47, 0.06) 100%);
+  border: 1px solid rgba(213, 183, 107, 0.44);
+  color: #fff4da;
+  text-decoration: none;
+  transition: all 0.22s ease;
+}
+
+.auth-login-cta:hover {
+  background: linear-gradient(135deg, rgba(213, 183, 107, 0.26) 0%, rgba(155, 111, 47, 0.16) 100%);
+  border-color: #f4d993;
+  transform: translateY(-2px);
+}

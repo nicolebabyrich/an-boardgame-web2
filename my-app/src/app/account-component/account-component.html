@@ -1,0 +1,495 @@
+<ng-container *ngIf="user as currentUser; else loginPrompt">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Hồ sơ khách hàng</p>
+      <h1>Xin chào, {{ currentUser.fullName }}</h1>
+      <p class="muted">
+        {{ activeSection === 'profile' ? 'Quản lý thông tin nhận diện cá nhân.' : (activeSection === 'addresses' ? 'Quản lý sổ địa chỉ giao nhận.' : (activeSection === 'security' ? 'Đổi mật khẩu & Bảo mật tài khoản.' : 'Tích lũy Ngọc Ấn, hạng Điều tra viên và theo dõi lịch sử hỗ trợ.')) }}
+      </p>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:0.75rem;">
+        <button class="button button--primary button--small" type="button" (click)="switchPage('rewards')" style="border-radius:999px;padding:0.42rem 1rem;">
+          🏅 Ngọc Ấn &amp; Lịch sử Tư vấn ({{ memberSummary.ngocAnPoints }} Ấn · {{ memberSummary.rankName }})
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container account-layout">
+      <nav class="account-nav surface" aria-label="Tài khoản">
+        <button
+          [class.is-active]="activeSection === 'profile'"
+          type="button"
+          (click)="switchPage('profile')"
+        >
+          1. Hồ sơ cá nhân
+        </button>
+        <button
+          [class.is-active]="activeSection === 'addresses'"
+          type="button"
+          (click)="switchPage('addresses')"
+        >
+          2. Sổ địa chỉ ({{ addresses.length }})
+        </button>
+        <button
+          [class.is-active]="activeSection === 'security'"
+          type="button"
+          (click)="switchPage('security')"
+        >
+          3. Đổi mật khẩu
+        </button>
+        <button
+          [class.is-active]="activeSection === 'rewards'"
+          type="button"
+          (click)="switchPage('rewards')"
+        >
+          4. Ngọc Ấn &amp; Lịch sử Tư vấn
+        </button>
+        <a routerLink="/orders">5. Đơn hàng của tôi</a>
+        <button class="button button--danger button--small" type="button" (click)="logout()">
+          Đăng xuất
+        </button>
+      </nav>
+
+      <div>
+        <!-- TRANG 1: HỒ SƠ CÁ NHÂN -->
+        <section *ngIf="activeSection === 'profile'" class="account-panel surface" id="profile">
+          <div class="address-card__header">
+            <div>
+              <p class="eyebrow">Thông tin cá nhân</p>
+              <h2>Hồ sơ tài khoản</h2>
+            </div>
+            <button class="button button--secondary button--small" type="button" (click)="switchPage('addresses')">
+              Sang trang Sổ địa chỉ →
+            </button>
+          </div>
+          <form id="profile-form" class="form-grid" novalidate (ngSubmit)="onSubmitProfile()">
+            <label class="form-field form-field--full">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Họ và tên (từ 2 ký tự) <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="profileErrors['fullName']"
+                name="fullName"
+                minlength="2"
+                maxlength="100"
+                required
+                [(ngModel)]="profileData.fullName"
+                (input)="validateProfileField('fullName', false)"
+                (blur)="validateProfileField('fullName', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="profileErrors['fullName']">{{ profileErrors['fullName'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Email <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="profileErrors['email']"
+                type="email"
+                name="email"
+                maxlength="254"
+                required
+                [(ngModel)]="profileData.email"
+                (input)="validateProfileField('email', false)"
+                (blur)="validateProfileField('email', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="profileErrors['email']">{{ profileErrors['email'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Số điện thoại <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="profileErrors['phone']"
+                name="phone"
+                inputmode="numeric"
+                maxlength="10"
+                pattern="0[35789][0-9]{8}"
+                required
+                [(ngModel)]="profileData.phone"
+                (input)="validateProfileField('phone', false)"
+                (blur)="validateProfileField('phone', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="profileErrors['phone']">{{ profileErrors['phone'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">Ngày sinh</span>
+              <input
+                class="form-control"
+                [class.has-error]="profileErrors['dateOfBirth']"
+                type="date"
+                name="dateOfBirth"
+                [max]="maxBirthDate"
+                [(ngModel)]="profileData.dateOfBirth"
+                (change)="validateProfileField('dateOfBirth', true)"
+                (blur)="validateProfileField('dateOfBirth', false)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="profileErrors['dateOfBirth']">{{ profileErrors['dateOfBirth'] }}</small>
+            </label>
+
+            <p class="form-message form-field--full" [class.form-message--success]="profileSuccess" id="profile-message">
+              {{ profileMessage }}
+            </p>
+            <div class="button-row form-field--full">
+              <button class="button button--primary" type="submit">Lưu thay đổi</button>
+              <a class="button button--ghost" routerLink="/cart">← Quay lại Giỏ hàng</a>
+            </div>
+          </form>
+        </section>
+
+        <!-- TRANG 2: SỔ ĐỊA CHỈ GIAO HÀNG -->
+        <section *ngIf="activeSection === 'addresses'" class="account-panel surface" id="addresses">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.25rem;padding-bottom:0.85rem;border-bottom:1px solid rgba(234,214,166,0.14);">
+            <div>
+              <p class="eyebrow" style="margin-bottom:0.2rem;">Giao nhận</p>
+              <h2 style="margin:0;white-space:nowrap;">Sổ địa&nbsp;chỉ giao&nbsp;hàng</h2>
+            </div>
+            <div style="display:inline-flex;align-items:center;gap:0.55rem;flex-wrap:nowrap;">
+              <a
+                class="button button--ghost button--small"
+                routerLink="/cart"
+                style="white-space:nowrap;padding:0.42rem 0.85rem;border-radius:999px;font-size:0.8rem;"
+              >
+                &larr; Về Giỏ hàng
+              </a>
+              <a
+                *ngIf="store.getCartCount() > 0"
+                class="button button--primary button--small"
+                routerLink="/checkout"
+                style="white-space:nowrap;padding:0.42rem 0.95rem;border-radius:999px;font-size:0.8rem;"
+              >
+                Tiếp tục Checkout &rarr;
+              </a>
+            </div>
+          </div>
+
+          <div class="address-list">
+            <ng-container *ngIf="addresses.length; else emptyAddresses">
+              <article class="address-card surface" *ngFor="let address of addresses">
+                <div class="address-card__header">
+                  <div>
+                    <h3>{{ address.label }}</h3>
+                    <span class="default-badge" *ngIf="address.isDefault">Địa chỉ mặc định</span>
+                  </div>
+                  <div class="button-row">
+                    <button class="button button--ghost button--small" type="button" (click)="editAddress(address)">Sửa</button>
+                    <button
+                      class="button button--ghost button--small"
+                      type="button"
+                      *ngIf="!address.isDefault"
+                      (click)="setDefaultAddress(address.id)"
+                    >
+                      Đặt mặc định
+                    </button>
+                    <button class="button button--danger button--small" type="button" (click)="deleteAddress(address.id)">Xóa</button>
+                  </div>
+                </div>
+                <p><strong>{{ address.receiverName }}</strong> · {{ address.receiverPhone }}</p>
+                <p class="muted">{{ formatAddressLine(address) }}</p>
+              </article>
+            </ng-container>
+            <ng-template #emptyAddresses>
+              <p class="muted">Bạn chưa có địa chỉ giao hàng.</p>
+            </ng-template>
+          </div>
+
+          <hr>
+          <h3 id="address-form-title">{{ addressFormTitle }}</h3>
+          <form id="address-form" class="form-grid" novalidate (ngSubmit)="onSubmitAddress()">
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Tên người nhận (từ 2 ký tự) <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="addressErrors['receiverName']"
+                name="receiverName"
+                minlength="2"
+                maxlength="100"
+                required
+                [(ngModel)]="addressData.receiverName"
+                (input)="validateAddressField('receiverName', false)"
+                (blur)="validateAddressField('receiverName', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['receiverName']">{{ addressErrors['receiverName'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Số điện thoại <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="addressErrors['receiverPhone']"
+                name="receiverPhone"
+                inputmode="numeric"
+                maxlength="10"
+                pattern="0[35789][0-9]{8}"
+                placeholder="0901234567"
+                required
+                [(ngModel)]="addressData.receiverPhone"
+                (input)="validateAddressField('receiverPhone', false)"
+                (blur)="validateAddressField('receiverPhone', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['receiverPhone']">{{ addressErrors['receiverPhone'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Tỉnh / Thành phố <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <select
+                class="form-control"
+                [class.has-error]="addressErrors['province']"
+                name="province"
+                id="province-select"
+                required
+                [(ngModel)]="addressData.province"
+                (change)="onProvinceChange()"
+              >
+                <option value="">Chọn tỉnh/thành phố</option>
+                <option *ngFor="let p of provinces" [value]="p.name">{{ p.name }}</option>
+              </select>
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['province']">{{ addressErrors['province'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">Quận / Huyện <small>(tùy chọn)</small></span>
+              <input
+                class="form-control"
+                name="district"
+                maxlength="100"
+                placeholder="Dùng cho địa chỉ hành chính cũ"
+                [(ngModel)]="addressData.district"
+              >
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Phường / Xã <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <select
+                class="form-control"
+                [class.has-error]="addressErrors['ward']"
+                name="ward"
+                id="ward-select"
+                required
+                [disabled]="!addressData.province || loadingWards"
+                [(ngModel)]="addressData.ward"
+                (change)="validateAddressField('ward', true)"
+              >
+                <option value="">{{ loadingWards ? 'Đang tải phường/xã...' : (addressData.province ? 'Chọn phường/xã' : 'Chọn tỉnh/thành trước') }}</option>
+                <option *ngFor="let w of wards" [value]="w.name">{{ w.name }}</option>
+              </select>
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['ward']">{{ addressErrors['ward'] }}</small>
+            </label>
+
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">Nhãn địa chỉ</span>
+              <select
+                class="form-control"
+                name="labelChoice"
+                id="address-label-select"
+                [(ngModel)]="addressData.labelChoice"
+              >
+                <option value="Nhà riêng">Nhà riêng</option>
+                <option value="Công ty">Công ty</option>
+                <option value="Trường học">Trường học</option>
+                <option value="OTHER">Khác</option>
+              </select>
+            </label>
+
+            <label class="form-field" [class.is-hidden]="addressData.labelChoice !== 'OTHER'" id="custom-label-field">
+              <span class="form-label" style="color:var(--gold-soft);">Nhãn tùy chỉnh <span style="color:#ef4444;">*</span></span>
+              <input
+                class="form-control"
+                [class.has-error]="addressErrors['labelCustom']"
+                name="labelCustom"
+                maxlength="50"
+                placeholder="Ví dụ: Nhà người thân"
+                [(ngModel)]="addressData.labelCustom"
+                (input)="validateAddressField('labelCustom', false)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['labelCustom']">{{ addressErrors['labelCustom'] }}</small>
+            </label>
+
+            <label class="form-field form-field--full">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Địa chỉ chi tiết <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                [class.has-error]="addressErrors['detailAddress']"
+                name="detailAddress"
+                minlength="5"
+                maxlength="255"
+                required
+                [(ngModel)]="addressData.detailAddress"
+                (input)="validateAddressField('detailAddress', false)"
+                (blur)="validateAddressField('detailAddress', true)"
+              >
+              <small class="field-error" style="color:#f87171;" role="alert" *ngIf="addressErrors['detailAddress']">{{ addressErrors['detailAddress'] }}</small>
+            </label>
+
+            <label class="filter-option form-field--full">
+              <input type="checkbox" name="isDefault" [(ngModel)]="addressData.isDefault">
+              Đặt làm địa chỉ mặc định
+            </label>
+
+            <p class="form-message form-field--full" [class.form-message--success]="addressSuccess" id="address-message">
+              {{ addressMessage }}
+            </p>
+            <div class="button-row form-field--full">
+              <button class="button button--primary" type="submit">Lưu địa chỉ</button>
+              <button class="button button--ghost" type="button" (click)="resetAddressForm()">Làm mới</button>
+              <a class="button button--secondary" routerLink="/cart">← Quay lại Giỏ hàng</a>
+            </div>
+          </form>
+        </section>
+
+        <!-- TRANG 3: ĐỔI MẬT KHẨU -->
+        <section *ngIf="activeSection === 'security'" class="account-panel surface" id="security">
+          <p class="eyebrow">Bảo mật tài khoản</p>
+          <h2>Cập nhật mật khẩu mới</h2>
+          <p class="muted">
+            Mật khẩu mới sẽ được kiểm tra trùng khớp 2 lần, mã hóa bảo mật SHA-256 và cập nhật trực tiếp vào cơ sở dữ liệu hệ thống.
+          </p>
+          <form class="form-grid" (ngSubmit)="onSubmitPassword()" novalidate>
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Mật khẩu mới <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                type="password"
+                name="newPassword"
+                [(ngModel)]="passwordData.newPassword"
+                placeholder="Tối thiểu 6 ký tự"
+                required
+              >
+            </label>
+            <label class="form-field">
+              <span class="form-label" style="color:var(--gold-soft);">
+                Nhập lại mật khẩu mới <span style="color:#ef4444;font-weight:700;">*</span>
+              </span>
+              <input
+                class="form-control"
+                type="password"
+                name="confirmPassword"
+                [(ngModel)]="passwordData.confirmPassword"
+                placeholder="Nhập lại đúng mật khẩu mới"
+                required
+              >
+              <small
+                *ngIf="passwordData.confirmPassword && passwordData.newPassword !== passwordData.confirmPassword"
+                style="color:#f87171;"
+              >
+                ✗ Hai mật khẩu chưa khớp nhau!
+              </small>
+              <small
+                *ngIf="passwordData.confirmPassword && passwordData.newPassword === passwordData.confirmPassword"
+                style="color:#4ade80;"
+              >
+                ✓ Mật khẩu xác nhận đã trùng khớp.
+              </small>
+            </label>
+            <p class="form-message form-field--full" [class.form-message--success]="passwordSuccess">
+              {{ passwordMessage }}
+            </p>
+            <div class="button-row form-field--full">
+              <button class="button button--primary" type="submit">Cập nhật mật khẩu</button>
+              <button class="button button--ghost" type="button" (click)="switchPage('profile')">← Về Hồ sơ cá nhân</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- TRANG 4: NGỌC ẤN, HẠNG ĐIỀU TRA VIÊN & LỊCH SỬ TƯ VẤN (Lấy cảm hứng từ Panacea Coin/Star & Chat History) -->
+        <section *ngIf="activeSection === 'rewards' && memberSummary as mem" class="account-panel surface" id="rewards">
+          <p class="eyebrow">Đặc quyền Điều tra viên</p>
+          <h2>Ngọc Ấn Tích Lũy & Hạng Thành Viên</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:0.85rem;margin-bottom:1.25rem;">
+            <article class="surface" style="padding:1rem;border-radius:10px;border:1px solid rgba(213,183,107,0.35);">
+              <small class="muted">Cấp bậc hiện tại</small>
+              <strong style="display:block;font-size:1.15rem;color:var(--color-gold-soft);margin:0.25rem 0;">🎖️ {{ mem.rankName }}</strong>
+              <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:999px;overflow:hidden;margin-top:0.35rem;">
+                <div [style.width.%]="mem.progressPercent" style="height:100%;background:var(--color-gold);"></div>
+              </div>
+              <small class="muted" style="display:block;margin-top:0.25rem;">Tiến độ thăng cấp: {{ mem.progressPercent }}%</small>
+            </article>
+            <article class="surface" style="padding:1rem;border-radius:10px;border:1px solid rgba(34,197,94,0.35);">
+              <small class="muted">Số dư Ngọc Ấn (Xu thưởng)</small>
+              <strong style="display:block;font-size:1.35rem;color:#86efac;margin:0.25rem 0;">🪙 {{ mem.ngocAnPoints }} Ngọc Ấn</strong>
+              <small class="muted">Tích lũy tự động từ {{ mem.totalOrders }} đơn hàng ({{ store.formatCurrency(mem.totalSpent) }})</small>
+            </article>
+          </div>
+
+          <h3 style="font-size:1.05rem;margin-bottom:0.65rem;">Đổi Ngọc Ấn lấy Mật lệnh Ưu đãi</h3>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));gap:0.75rem;margin-bottom:1.5rem;">
+            <div style="padding:0.85rem;border-radius:8px;background:rgba(0,0,0,0.32);border:1px dashed rgba(213,183,107,0.45);display:flex;justify-content:space-between;align-items:center;gap:0.6rem;">
+              <div>
+                <strong style="color:var(--color-gold-soft);">THAMTU50 (-50.000 ₫)</strong>
+                <small class="muted" style="display:block;">Đơn từ 400.000 ₫ · Cần 50 Ngọc Ấn</small>
+              </div>
+              <button type="button" class="button button--primary button--small" (click)="copyRewardCode('THAMTU50')">Đổi mã</button>
+            </div>
+            <div style="padding:0.85rem;border-radius:8px;background:rgba(0,0,0,0.32);border:1px dashed rgba(213,183,107,0.45);display:flex;justify-content:space-between;align-items:center;gap:0.6rem;">
+              <div>
+                <strong style="color:var(--color-gold-soft);">FREESHIP (-30.000 ₫)</strong>
+                <small class="muted" style="display:block;">Miễn phí ship đơn từ 300k · 30 Ngọc Ấn</small>
+              </div>
+              <button type="button" class="button button--secondary button--small" (click)="copyRewardCode('FREESHIP')">Đổi mã</button>
+            </div>
+          </div>
+
+          <h3 style="font-size:1.05rem;margin-bottom:0.65rem;">Lịch sử kết nối Tư vấn viên & Phản hồi</h3>
+          <div style="display:grid;gap:0.75rem;" *ngIf="myAdvisorTickets.length; else noTicketsTpl">
+            <div
+              *ngFor="let t of myAdvisorTickets"
+              style="padding:0.85rem 1rem;border-radius:8px;background:rgba(0,0,0,0.35);border-left:4px solid;"
+              [style.borderLeftColor]="t.emotionColor || '#22c55e'"
+            >
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.35rem;">
+                <strong style="color:var(--color-gold-soft);">{{ t.ticketCode }} · {{ t.createdAt }}</strong>
+                <span class="status-badge" [ngClass]="t.status === 'RESOLVED' ? 'status-badge--success' : 'status-badge--warning'">
+                  {{ t.status === 'RESOLVED' ? 'Đã phản hồi' : 'Đang chờ Tư vấn viên' }}
+                </span>
+              </div>
+              <p class="muted" style="margin:0 0 0.35rem 0;font-size:0.86rem;">Nội dung gửi: "{{ t.softenedMessage || t.originalMessage }}"</p>
+              <div *ngIf="t.advisorReply" style="padding:0.55rem 0.75rem;border-radius:6px;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);font-size:0.86rem;color:#ecfdf5;">
+                <strong>👩‍💼 Tư vấn viên phản hồi:</strong> {{ t.advisorReply }}
+              </div>
+            </div>
+          </div>
+          <ng-template #noTicketsTpl>
+            <p class="muted">Bạn chưa có phiên yêu cầu hỗ trợ Tư vấn viên nào.</p>
+          </ng-template>
+        </section>
+      </div>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #loginPrompt>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◎</div>
+          <h3>Cần đăng nhập</h3>
+          <p class="muted">Đăng nhập hoặc tạo tài khoản để quản lý hồ sơ và địa chỉ giao hàng.</p>
+          <div class="button-row" style="justify-content:center;">
+            <a class="button button--primary" routerLink="/login">Đăng nhập / Đăng ký</a>
+            <a class="button button--secondary" routerLink="/cart">← Quay lại Giỏ hàng</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

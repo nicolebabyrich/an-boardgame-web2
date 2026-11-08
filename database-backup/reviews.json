@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faeaa9",
+    "id": 1,
+    "userId": 1,
+    "productId": 1,
+    "orderId": 4,
+    "rating": 5,
+    "comment": "Cốt truyện cuốn hút, chất lượng thẻ và hộp rất đẹp.",
+    "status": "VISIBLE",
+    "createdAt": "24.06.2026"
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaaa",
+    "id": 2,
+    "userId": 4,
+    "productId": 4,
+    "orderId": 4,
+    "rating": 5,
+    "comment": "Combo Hoàng Kim đóng gói kỹ, vật phẩm đẹp và rất hợp không khí trinh thám.",
+    "status": "VISIBLE",
+    "createdAt": "22.06.2026"
+  }
+]

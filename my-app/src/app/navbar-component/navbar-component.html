@@ -1,0 +1,129 @@
+<header class="site-header">
+  <div class="container navbar">
+    <nav class="history-navigation" aria-label="Điều hướng lịch sử trang">
+      <button class="history-navigation__button" type="button" (click)="historyBack()" aria-label="Quay lại trang trước" title="Quay lại">
+        <svg class="bi bi-arrow-left" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8"/></svg>
+      </button>
+      <button class="history-navigation__button" type="button" (click)="historyForward()" aria-label="Đi tới trang tiếp theo" title="Đi tiếp">
+        <svg class="bi bi-arrow-right" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/></svg>
+      </button>
+    </nav>
+
+    <a class="brand" routerLink="/home" [queryParams]="{ section: 'story' }" aria-label="ẨN Store - Trang chủ" (click)="closeMenus()">
+      <span class="brand-mark" aria-hidden="true"><img src="/asset/Asset%202@4x.png?v=20260708" alt=""></span>
+    </a>
+
+    <!-- Thanh điều hướng dạng Pill-Bar phân tách từng cục theo mạch cốt truyện -->
+    <nav class="nav-links panacea-pill-nav" id="site-navigation" [class.is-open]="menuOpen" aria-label="Điều hướng chính">
+      <a
+        *ngFor="let item of storyPillLinks"
+        class="panacea-pill-link"
+        [class.is-active]="isStorySectionActive(item.section)"
+        [routerLink]="item.path"
+        (click)="closeMenus()"
+      >
+        {{ item.label }}
+      </a>
+
+      <a
+        class="panacea-pill-link"
+        [class.is-active]="isRouteActive('/products')"
+        routerLink="/products"
+        (click)="closeMenus()"
+      >
+        Tàng thư vật phẩm
+      </a>
+
+      <!-- Menu mở rộng: Mật lệnh ưu đãi, Biên bản lưu trữ (Blog), Hồ sơ đơn án -->
+      <div class="panacea-dropdown-wrap">
+        <button
+          type="button"
+          class="panacea-pill-link"
+          [class.is-active]="isMoreActive()"
+          (click)="toggleMoreDropdown()"
+          [attr.aria-expanded]="moreDropdownOpen"
+        >
+          <span>Lưu trữ &amp; Ưu đãi</span>
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708"/>
+          </svg>
+        </button>
+
+        <div class="panacea-dropdown-menu" *ngIf="moreDropdownOpen">
+          <a
+            class="panacea-dropdown-item"
+            [class.is-active]="isStorySectionActive('offers')"
+            routerLink="/home"
+            [queryParams]="{ section: 'offers' }"
+            (click)="closeMenus()"
+          >
+            <span>🧧 Mật lệnh Ưu đãi</span>
+          </a>
+          <a
+            class="panacea-dropdown-item"
+            [class.is-active]="isRouteActive('/blog')"
+            routerLink="/blog"
+            (click)="closeMenus()"
+          >
+            <span>📜 Biên bản Lưu trữ (Blog)</span>
+          </a>
+          <a
+            class="panacea-dropdown-item"
+            [class.is-active]="isRouteActive('/orders')"
+            routerLink="/orders"
+            (click)="closeMenus()"
+          >
+            <span>⚖️ Tra cứu Đơn án</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav-actions" style="display:flex;align-items:center;gap:0.65rem;">
+      <!-- Khi CHƯA ĐĂNG NHẬP -->
+      <ng-container *ngIf="!currentUser; else loggedInTpl">
+        <a
+          class="button button--secondary button--small"
+          routerLink="/login"
+          style="padding:0.42rem 0.9rem;font-size:0.8rem;font-weight:700;display:inline-flex;align-items:center;gap:0.4rem;border-radius:999px;border-color:rgba(213,183,107,0.55);white-space:nowrap;"
+        >
+          <svg class="bi bi-person" viewBox="0 0 16 16" style="width:14px;height:14px;" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4"/></svg>
+          <span>Đăng nhập / Đăng ký</span>
+        </a>
+      </ng-container>
+
+      <!-- Khi ĐÃ ĐĂNG NHẬP: Hiển thị tên tài khoản + Sổ địa chỉ + Đăng xuất (Chữ to rõ, không bao giờ rớt chữ) -->
+      <ng-template #loggedInTpl>
+        <div class="user-nav-group">
+          <a
+            class="button user-account-link"
+            routerLink="/account"
+            title="Quản lý hồ sơ cá nhân"
+          >
+            <svg class="bi bi-person" viewBox="0 0 16 16" style="width:16px;height:16px;" aria-hidden="true"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4"/></svg>
+            <span>{{ currentUser?.fullName }}</span>
+          </a>
+          <a
+            class="button user-address-link"
+            routerLink="/addresses"
+            title="Sổ địa chỉ nhận hàng"
+          >
+            Sổ địa chỉ
+          </a>
+          <button
+            class="button user-logout-btn"
+            type="button"
+            (click)="logout()"
+            title="Đăng xuất khỏi tài khoản"
+          >
+            Đăng xuất
+          </button>
+        </div>
+      </ng-template>
+
+      <button class="menu-toggle" type="button" (click)="toggleMenu()" aria-controls="site-navigation" [attr.aria-expanded]="menuOpen">
+        <svg class="bi bi-list" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5"/></svg>
+      </button>
+    </div>
+  </div>
+</header>

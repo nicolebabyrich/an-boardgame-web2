@@ -1,0 +1,135 @@
+<ng-container *ngIf="items.length > 0; else emptyCartTpl">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs"><a routerLink="/home">Trang chủ</a><span>/</span><span>Giỏ hàng</span></nav>
+      <p class="eyebrow">Giỏ hàng</p>
+      <h1>Hồ sơ đang chọn</h1>
+      <!-- Thông báo trạng thái Giỏ hàng Vãng lai vs Thành viên (Bug #31) & Giữ chỗ 15 phút (Bug #2) -->
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.75rem;">
+        <span class="status-badge status-badge--info">
+          ⏳ Giữ chỗ đơn hàng tạm thời: <strong>{{ holdTimerText }}</strong> phút
+        </span>
+        <span *ngIf="store.getCurrentUser() as user" class="status-badge status-badge--success">
+          👤 Giỏ hàng Thành viên: {{ user.fullName }} (Đã đồng bộ tài khoản)
+        </span>
+        <span *ngIf="!store.getCurrentUser()" class="status-badge status-badge--warning">
+          🛒 Giỏ hàng Khách vãng lai (Tự động giữ sản phẩm khi chuyển sang Đăng nhập / Đặt hàng nhanh)
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-column-layout">
+      <div class="cart-list">
+        <label class="cart-select-all surface">
+          <input type="checkbox" id="select-all-cart-items" [checked]="allSelected" (change)="toggleAll($event)">
+          <span>Chọn tất cả ({{ items.length }} sản phẩm)</span>
+        </label>
+
+        <article *ngFor="let item of items" class="cart-item surface">
+          <ng-container *ngIf="item.product as prod">
+            <label class="cart-item__select" [attr.aria-label]="'Chọn ' + prod.name + ' để thanh toán'">
+              <input type="checkbox" [checked]="item.selected" (change)="toggleItem(prod.id, $event)">
+            </label>
+            <a [routerLink]="['/products', prod.id]">
+              <img [src]="prod.images[0]" [alt]="prod.name">
+            </a>
+            <div>
+              <p class="eyebrow">{{ store.getCategoryName(prod.category) }}</p>
+              <h3><a [routerLink]="['/products', prod.id]">{{ prod.name }}</a></h3>
+              <div class="price">
+                <span class="price-current">{{ store.formatCurrency(prod.discountPrice ?? prod.price) }}</span>
+                <span *ngIf="prod.discountPrice" class="price-old">{{ store.formatCurrency(prod.price) }}</span>
+              </div>
+
+              <!-- Chọn thuộc tính sản phẩm ngay trong giỏ hàng (Right #2) -->
+              <div style="margin:0.45rem 0;">
+                <label style="font-size:0.82rem;color:var(--gold-soft);display:inline-flex;align-items:center;gap:0.4rem;">
+                  <span>Phân loại / Size:</span>
+                  <select
+                    class="form-control"
+                    style="padding:0.25rem 0.55rem;font-size:0.82rem;width:auto;min-width:170px;"
+                    [value]="item.attribute || getAttributeOptions(prod)[0]"
+                    (change)="onAttributeChange(prod.id, $event)"
+                  >
+                    <option *ngFor="let opt of getAttributeOptions(prod)" [value]="opt" [selected]="opt === (item.attribute || getAttributeOptions(prod)[0])">
+                      {{ opt }}
+                    </option>
+                  </select>
+                </label>
+              </div>
+
+              <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin-top:0.4rem;">
+                <div class="quantity-control" [attr.aria-label]="'Số lượng ' + prod.name">
+                  <button type="button" (click)="decrease(item)">-</button>
+                  <input
+                    type="number"
+                    [value]="item.quantity"
+                    min="1"
+                    [max]="prod.stock"
+                    (change)="onQuantityChange(item, $event)"
+                    aria-label="Số lượng"
+                  >
+                  <button type="button" (click)="increase(item)">+</button>
+                </div>
+                <small class="stock-note">Còn {{ prod.stock }} sản phẩm</small>
+                <button class="button button--danger button--small" type="button" (click)="requestRemove(prod.id)">
+                  🗑 Xóa sản phẩm
+                </button>
+              </div>
+            </div>
+            <div class="cart-item__price">
+              <span class="muted">Thành tiền</span>
+              <strong>{{ store.formatCurrency((prod.discountPrice ?? prod.price) * item.quantity) }}</strong>
+            </div>
+          </ng-container>
+        </article>
+
+        <p class="form-message" id="cart-message">{{ cartMessage }}</p>
+        <a class="button button--secondary" routerLink="/products">← Tiếp tục mua hàng</a>
+
+        <dialog #removeDialog class="confirm-dialog cart-remove-dialog" id="cart-remove-dialog">
+          <form method="dialog" id="cart-remove-form" (ngSubmit)="confirmRemove()">
+            <p class="eyebrow">Xác nhận thao tác</p>
+            <h2>Xóa sản phẩm khỏi giỏ?</h2>
+            <p class="muted">Sản phẩm sẽ được bỏ khỏi giỏ hàng hiện tại. Bạn vẫn có thể thêm lại từ trang sản phẩm.</p>
+            <div class="button-row">
+              <button class="button button--ghost" type="button" (click)="closeRemoveDialog()">Quay lại</button>
+              <button class="button button--danger" type="submit">Xóa sản phẩm</button>
+            </div>
+          </form>
+        </dialog>
+      </div>
+
+      <aside class="summary-card surface">
+        <p class="eyebrow">Tóm tắt</p>
+        <h2>Chi phí dự kiến</h2>
+        <div class="summary-line"><span>Tạm tính ({{ selectedCount }} mục)</span><strong>{{ store.formatCurrency(summary.subtotal) }}</strong></div>
+        <div class="summary-line"><span>Phí vận chuyển</span><strong>{{ summary.shippingFee ? store.formatCurrency(summary.shippingFee) : 'Miễn phí' }}</strong></div>
+        <div class="summary-line summary-line--total"><span>Tổng dự kiến</span><strong>{{ store.formatCurrency(summary.total) }}</strong></div>
+        <a *ngIf="selectedCount > 0" class="button button--primary" routerLink="/checkout">Tiến hành thanh toán →</a>
+        <button *ngIf="selectedCount === 0" class="button button--primary" type="button" disabled>Chọn sản phẩm để thanh toán</button>
+        <p *ngIf="!store.getCurrentUser()" class="muted" style="font-size:0.8rem;margin-top:0.65rem;">
+          💡 Bạn có thể đặt hàng nhanh với tư cách <strong>Khách vãng lai</strong> ở bước tiếp theo hoặc <a routerLink="/login" [queryParams]="{ redirect: '/checkout' }" style="color:var(--gold-soft);text-decoration:underline;">Đăng nhập tài khoản</a>.
+        </p>
+      </aside>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #emptyCartTpl>
+  <section class="page-hero"><div class="container"><p class="eyebrow">Giỏ hàng</p><h1>Hồ sơ đang chọn</h1></div></section>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">⌑</div>
+          <h3>Giỏ hàng đang trống</h3>
+          <p class="muted">Kho lưu trữ vẫn còn nhiều hồ sơ đang chờ được mở.</p>
+          <a class="button button--primary" routerLink="/products">Tiếp tục mua hàng</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

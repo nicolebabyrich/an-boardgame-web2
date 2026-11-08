@@ -1,0 +1,257 @@
+<ng-container *ngIf="summary.items.length > 0; else noSelectedItemsTpl">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <a routerLink="/home">Trang chủ</a><span>/</span>
+        <a routerLink="/cart">Giỏ hàng</a><span>/</span>
+        <span>Checkout</span>
+      </nav>
+      <p class="eyebrow">Checkout bảo mật & Giữ chỗ 15 phút</p>
+      <h1>Xác nhận hồ sơ đặt hàng</h1>
+      <p class="muted">Hệ thống đang tạm giữ chỗ tồn kho 15 phút cho các vật phẩm bạn đã chọn.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-column-layout">
+      <form class="checkout-steps" id="checkout-form" (ngSubmit)="submitOrder()">
+        <!-- Thông báo cho khách chưa đăng nhập (Bug #24, #19, Right #1) -->
+        <section *ngIf="!store.getCurrentUser()" class="checkout-step surface" style="border-left:4px solid #d5b76b;">
+          <p class="eyebrow">Lưu ý tài khoản</p>
+          <h3 style="margin-bottom:0.4rem;">🔔 CẦN TẠO TÀI KHOẢN hoặc Đặt hàng Khách vãng lai</h3>
+          <p class="muted" style="margin-bottom:0.75rem;">
+            Bạn chưa đăng nhập. Bạn có thể <strong>Đăng ký / Đăng nhập</strong> để lưu sổ địa chỉ, hoặc điền thông tin bên dưới để <strong>Đặt hàng vãng lai</strong> (Hệ thống sẽ tự động tạo tài khoản trạng thái <em>Chưa kích hoạt</em> kèm Link & mã OTP 6 số gửi qua email).
+          </p>
+          <div class="button-row">
+            <a class="button button--primary button--small" routerLink="/login" [queryParams]="{ redirect: '/checkout' }">Đăng nhập ngay</a>
+            <a class="button button--secondary button--small" routerLink="/register">Đăng ký tài khoản mới</a>
+            <a class="button button--ghost button--small" routerLink="/cart">← Quay lại giỏ hàng</a>
+          </div>
+        </section>
+
+        <!-- BƯỚC 1: ĐỊA CHỈ GIAO NHẬN (Thành viên hoặc Khách vãng lai) -->
+        <section class="checkout-step surface">
+          <div class="checkout-step__title">
+            <span class="step-number">1</span>
+            <div><p class="eyebrow">Giao nhận</p><h2>Thông tin & Địa chỉ nhận hàng</h2></div>
+          </div>
+
+          <ng-container *ngIf="store.getCurrentUser() as user; else guestAddressTpl">
+            <ng-container *ngIf="addresses.length > 0; else memberNoAddressTpl">
+              <div class="address-list">
+                <label *ngFor="let address of addresses" class="radio-card">
+                  <input
+                    type="radio"
+                    name="addressId"
+                    [value]="address.id"
+                    [(ngModel)]="selectedAddressId"
+                    required
+                  >
+                  <span>
+                    <strong>{{ address.label }} · {{ address.receiverName }}</strong><br>
+                    <span class="muted">{{ address.receiverPhone }} · {{ formatAddressLine(address) }}</span>
+                  </span>
+                </label>
+              </div>
+              <div style="display:flex;gap:0.75rem;align-items:center;margin-top:0.75rem;flex-wrap:wrap;">
+                <a class="button button--secondary button--small" routerLink="/addresses" [queryParams]="{ from: 'checkout' }">+ Thêm / Quản lý địa chỉ</a>
+                <a class="button button--ghost button--small" routerLink="/cart">← Quay lại giỏ hàng</a>
+              </div>
+            </ng-container>
+            <ng-template #memberNoAddressTpl>
+              <p class="muted">Tài khoản của bạn chưa có địa chỉ nhận hàng mặc định.</p>
+              <div class="button-row" style="margin-top:0.75rem;">
+                <a class="button button--primary button--small" routerLink="/addresses" [queryParams]="{ from: 'checkout' }">Thêm địa chỉ giao hàng</a>
+                <a class="button button--ghost button--small" routerLink="/cart">← Quay lại giỏ hàng</a>
+              </div>
+            </ng-template>
+          </ng-container>
+
+          <!-- Form thông tin giao nhận cho Khách vãng lai (Bug #11 dấu *, #19, Right #1) -->
+          <ng-template #guestAddressTpl>
+            <div class="form-grid">
+              <label class="form-field">
+                <span class="form-label">Họ và tên người nhận <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" name="guestFullName" [(ngModel)]="guestInfo.fullName" placeholder="VD: An Nguyễn (từ 2 ký tự)" required>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Số điện thoại <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" name="guestPhone" [(ngModel)]="guestInfo.phone" placeholder="0901234567" required>
+              </label>
+              <label class="form-field form-field--full">
+                <span class="form-label">Email nhận xác nhận đơn & mã OTP kích hoạt TK <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" type="email" name="guestEmail" [(ngModel)]="guestInfo.email" placeholder="khachhang@example.com" required>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Tỉnh / Thành phố <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" name="guestProvince" [(ngModel)]="guestInfo.province" required>
+              </label>
+              <label class="form-field">
+                <span class="form-label">Phường / Xã <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" name="guestWard" [(ngModel)]="guestInfo.ward" placeholder="Phường Bến Nghé" required>
+              </label>
+              <label class="form-field form-field--full">
+                <span class="form-label">Số nhà, tên đường chi tiết <span style="color:#ef4444;">*</span></span>
+                <input class="form-control" name="guestDetail" [(ngModel)]="guestInfo.detailAddress" placeholder="Số 18 Trần Quốc Thảo" required>
+              </label>
+            </div>
+          </ng-template>
+        </section>
+
+        <!-- BƯỚC 2: VOUCHER KÈM NÚT COPY & QUY TẮC 1 LẦN/TÀI KHOẢN (Bug #9, #10) -->
+        <section class="checkout-step surface">
+          <div class="checkout-step__title">
+            <span class="step-number">2</span>
+            <div><p class="eyebrow">Ưu đãi (Mỗi tài khoản áp dụng 01 lần/mã)</p><h2>Áp dụng voucher</h2></div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:0.6rem;margin-bottom:0.95rem;">
+            <div
+              *ngFor="let v of availableVouchers"
+              style="border:1px dashed rgba(213,183,107,0.45);background:rgba(255,255,255,0.025);padding:0.55rem 0.75rem;border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;font-size:0.82rem;"
+            >
+              <div>
+                <strong style="color:var(--gold-soft);display:block;letter-spacing:0.04em;">{{ v.code }}</strong>
+                <span class="muted" style="font-size:0.75rem;">Đơn từ {{ store.formatCurrency(v.minOrder) }}</span>
+              </div>
+              <button
+                type="button"
+                class="button button--secondary button--small"
+                style="padding:0.28rem 0.65rem;font-size:0.75rem;white-space:nowrap;"
+                (click)="copyAndSelectVoucher(v.code)"
+              >Chọn mã</button>
+            </div>
+          </div>
+
+          <div class="newsletter-form">
+            <label class="form-field">
+              <span class="form-label">Mã voucher</span>
+              <input
+                class="form-control"
+                id="voucher-code"
+                name="voucherInput"
+                [(ngModel)]="voucherInput"
+                placeholder="Nhập hoặc bấm Copy mã ở trên (VD: AN10)"
+              >
+            </label>
+            <button class="button button--secondary" type="button" id="apply-voucher" (click)="applyVoucher()">Áp dụng</button>
+          </div>
+          <p class="form-message" [class.form-message--success]="voucherSuccess" id="voucher-message">
+            {{ voucherMessage }}
+          </p>
+        </section>
+
+        <!-- BƯỚC 3: PHƯƠNG THỨC THANH TOÁN -->
+        <section class="checkout-step surface">
+          <div class="checkout-step__title">
+            <span class="step-number">3</span>
+            <div><p class="eyebrow">Thanh toán</p><h2>Phương thức thanh toán</h2></div>
+          </div>
+          <div class="payment-method-list">
+            <label class="radio-card payment-radio-card">
+              <input type="radio" name="paymentMethod" value="COD" [(ngModel)]="paymentMethod">
+              <span class="payment-method-card__icon" aria-hidden="true">
+                <svg class="bi bi-credit-card" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2H0z"/><path d="M0 5v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5zm3 3h5a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1m0 2h3a.5.5 0 0 1 0 1H3a.5.5 0 0 1 0-1"/></svg>
+              </span>
+              <span>
+                <strong>Thanh toán khi nhận hàng (COD)</strong><br>
+                <span class="muted">Kiểm tra kiện hàng nguyên niêm phong và thanh toán cho bưu tá khi nhận.</span>
+              </span>
+            </label>
+            <label class="radio-card payment-radio-card">
+              <input type="radio" name="paymentMethod" value="MOCK_CARD" [(ngModel)]="paymentMethod">
+              <span class="payment-method-card__icon" aria-hidden="true">
+                <svg class="bi bi-qr-code" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M2 2h2v2H2zM1 1v4h4V1zM2 12h2v2H2zm-1-1v4h4v-4zm11-9h2v2h-2zm-1-1v4h4V1z"/><path d="M6 1h1v1H6zm2 0h1v2H8zM6 4h1v1H6zm3 0h1v2H9zM1 6h1v1H1zm3 0h2v1H4zm3 0h1v1H7zm2 0h1v1H9zm2 0h1v1h-1zm3 0h1v1h-1zM6 8h1v1H6zm2 0h3v1H8zm4 0h1v2h-1zm2 0h1v1h-1zM6 10h2v1H6zm3 0h1v1H9zm2 0h1v1h-1zm3 0h1v1h-1zM6 12h1v3H6zm2 0h1v1H8zm2 0h2v1h-2zm3 0h2v3h-2zm-4 2h3v1H9z"/></svg>
+              </span>
+              <span>
+                <strong>Thanh toán online bằng mã QR</strong><br>
+                <span class="muted">Quét mã QR chuyển khoản nhanh, xác nhận thanh toán tức thì.</span>
+              </span>
+            </label>
+          </div>
+          <button class="button button--secondary button--small" type="button" id="show-payment-qr" (click)="showQrModal = true">
+            Xem mã QR thanh toán
+          </button>
+          <p class="form-message" id="checkout-message">{{ checkoutMessage }}</p>
+          <div class="button-row" style="margin-top:0.75rem;">
+            <button class="button button--primary" type="submit">Xác nhận Đặt hàng</button>
+            <a class="button button--ghost" routerLink="/cart">← Quay lại giỏ hàng</a>
+          </div>
+        </section>
+      </form>
+
+      <aside class="summary-card surface">
+        <p class="eyebrow">
+          {{ store.getCurrentUser() ? ('Đơn hàng của ' + store.getCurrentUser()?.fullName) : 'Đơn hàng Khách vãng lai' }}
+        </p>
+        <h2>Tóm tắt thanh toán</h2>
+        <div *ngFor="let item of summary.items" class="summary-line" style="align-items:flex-start;">
+          <span>
+            {{ item.product?.name }} × {{ item.quantity }}<br>
+            <small class="muted">Phân loại: {{ item.attribute || 'Bản Tiêu Chuẩn' }}</small>
+          </span>
+          <strong>{{ store.formatCurrency(((item.product?.discountPrice ?? item.product?.price) || 0) * item.quantity) }}</strong>
+        </div>
+        <div class="summary-line"><span>Tạm tính</span><strong>{{ store.formatCurrency(summary.subtotal) }}</strong></div>
+        <div class="summary-line">
+          <span>Giảm giá{{ summary.voucher ? ' · ' + summary.voucher.code : '' }}</span>
+          <strong>-{{ store.formatCurrency(summary.discount) }}</strong>
+        </div>
+        <div class="summary-line">
+          <span>Phí vận chuyển</span>
+          <strong>{{ summary.shippingFee ? store.formatCurrency(summary.shippingFee) : 'Miễn phí' }}</strong>
+        </div>
+        <div class="summary-line summary-line--total">
+          <span>Thanh toán</span>
+          <strong>{{ store.formatCurrency(summary.total) }}</strong>
+        </div>
+
+        <!-- Trích dẫn Chính sách Mua hàng & Đổi trả ngay tại Checkout (Bug #14) -->
+        <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid rgba(213,183,107,0.25);font-size:0.83rem;">
+          <p class="eyebrow" style="margin-bottom:0.4rem;">Chính sách Mua hàng & Đổi trả</p>
+          <ul class="muted" style="padding-left:1.1rem;margin:0;display:grid;gap:0.35rem;">
+            <li><strong>Giữ chỗ tự động:</strong> Đơn hàng được giữ chỗ tồn kho trong 15 phút kể từ khi xác nhận.</li>
+            <li><strong>Vận chuyển:</strong> Miễn phí giao hàng toàn quốc cho đơn từ <strong>700.000 ₫</strong> (Đơn dưới 700k phí 30.000 ₫).</li>
+            <li><strong>Đổi trả trong 03 ngày:</strong> Hỗ trợ đổi mới hoặc trả hàng hoàn tiền nếu hộp game lỗi sản xuất, thiếu thẻ bài hoặc hư hại khi vận chuyển (có video/ảnh đồng kiểm).</li>
+            <li><strong>Hoàn tiền nhanh:</strong> Xử lý hoàn tiền trong 05-07 ngày làm việc đối với đơn thanh toán QR.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <div
+    *ngIf="showQrModal"
+    class="modal-backdrop payment-qr-backdrop"
+    data-payment-qr-modal="true"
+    (click)="$event.target === $event.currentTarget && (showQrModal = false)"
+  >
+    <article class="modal payment-qr-modal" role="dialog" aria-modal="true" aria-labelledby="payment-qr-title">
+      <button class="modal-close" type="button" (click)="showQrModal = false" aria-label="Đóng">×</button>
+      <p class="eyebrow">Thanh toán online mock</p>
+      <h2 id="payment-qr-title">Quét mã QR thanh toán</h2>
+      <img src="/img/payment/qr.jpg" alt="Mã QR thanh toán AN Store" (error)="qrError = true">
+      <p class="form-message payment-qr-error" [class.is-hidden]="!qrError">
+        Không tải được mã QR. Vui lòng kiểm tra file img/payment/qr.jpg.
+      </p>
+      <p class="muted">
+        Mã QR chỉ phục vụ demo giao diện. Sau khi chọn phương thức online và bấm Đặt hàng, hệ thống giả lập thanh toán thành công.
+      </p>
+    </article>
+  </div>
+</ng-container>
+
+<ng-template #noSelectedItemsTpl>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Chưa chọn sản phẩm</h3>
+          <p class="muted">Quay lại giỏ hàng và tích chọn ít nhất một sản phẩm cần thanh toán.</p>
+          <a class="button button--primary" routerLink="/cart">← Về giỏ hàng</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

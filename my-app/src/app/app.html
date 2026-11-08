@@ -1,0 +1,47 @@
+<button class="skip-link" type="button" (click)="skipToMain()">Bỏ qua đến nội dung chính</button>
+
+<div id="app">
+  <app-navbar-component *ngIf="!isStandaloneAdmin"></app-navbar-component>
+  <main id="main-content" *ngIf="!isStandaloneAdmin">
+    <router-outlet></router-outlet>
+  </main>
+  <router-outlet *ngIf="isStandaloneAdmin"></router-outlet>
+  <app-footer-component *ngIf="!isStandaloneAdmin"></app-footer-component>
+  <app-chatbot-component *ngIf="!isStandaloneAdmin"></app-chatbot-component>
+</div>
+
+<!-- Vùng hiển thị Toast thông báo toàn cục -->
+<div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true">
+  <div
+    *ngFor="let toast of store.toasts$ | async"
+    class="toast show"
+    [class.toast--error]="toast.error"
+  >
+    <span>{{ toast.message }}</span>
+    <a *ngIf="toast.actionRoute" class="toast__action" [routerLink]="toast.actionRoute">{{ toast.actionLabel }}</a>
+  </div>
+</div>
+
+<!-- Info Modal dùng chung (Chính sách, Hồ sơ nhân vật, Mô hình 3D) -->
+<div
+  *ngIf="store.infoModal$ | async as modal"
+  class="modal-backdrop"
+  [ngClass]="modal.modifier ? 'modal-backdrop--' + modal.modifier : ''"
+  data-info-modal="true"
+  (click)="$event.target === $event.currentTarget && store.closeInfoModal()"
+>
+  <article
+    class="modal info-modal"
+    [ngClass]="modal.modifier ? 'info-modal--' + modal.modifier : ''"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="info-modal-title"
+    (click)="onModalContentClick($event)"
+  >
+    <button class="modal-close" type="button" (click)="store.closeInfoModal()" aria-label="Đóng">×</button>
+    <p class="eyebrow">{{ modal.eyebrow }}</p>
+    <h2 id="info-modal-title" *ngIf="modal.titleHtml" [innerHTML]="safeHtml(modal.titleHtml)"></h2>
+    <h2 id="info-modal-title" *ngIf="!modal.titleHtml">{{ modal.title }}</h2>
+    <div class="info-modal__content" [innerHTML]="safeHtml(modal.contentHtml)"></div>
+  </article>
+</div>

@@ -1,0 +1,322 @@
+<ng-container *ngIf="order as currentOrder; else notFound">
+  <section class="page-hero">
+    <div class="container">
+      <nav class="breadcrumbs">
+        <a routerLink="/">Trang chủ</a>
+        <span>/</span>
+        <a routerLink="/orders">Đơn hàng</a>
+        <span>/</span>
+        <span>{{ currentOrder.code }}</span>
+      </nav>
+      <p class="eyebrow">Chi tiết đơn hàng</p>
+      <h1>{{ currentOrder.code }}</h1>
+      <span class="status-badge" [ngClass]="store.statusBadgeModifier(currentOrder.status)">
+        {{ store.statusLabel(currentOrder.status) }}
+      </span>
+      <div class="button-row order-detail-navigation" aria-label="Điều hướng đơn hàng">
+        <a class="button button--ghost" routerLink="/orders">← Quay lại danh sách đơn</a>
+        <a class="button button--secondary" routerLink="/products">Tiếp tục mua hàng</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container two-column-layout">
+      <div class="checkout-steps">
+        <section class="checkout-step surface">
+          <h2>Sản phẩm</h2>
+          <div class="cart-item" *ngFor="let item of currentOrder.items">
+            <img
+              [src]="store.getProduct(item.productId)?.images?.[0] || '/img/products/18.png'"
+              [alt]="store.getProduct(item.productId)?.name || 'Sản phẩm'"
+            >
+            <div>
+              <h3>{{ store.getProduct(item.productId)?.name || 'Sản phẩm' }}</h3>
+              <p class="muted">Số lượng: {{ item.quantity }}{{ item.attribute ? ' · Phân loại: ' + item.attribute : '' }}</p>
+            </div>
+            <strong>{{ store.formatCurrency(item.unitPrice * item.quantity) }}</strong>
+          </div>
+        </section>
+
+        <section class="checkout-step surface">
+          <h2>Hành trình đơn hàng</h2>
+          <div class="timeline">
+            <div class="timeline-item" *ngFor="let item of currentOrder.timeline">
+              <span class="timeline-dot"></span>
+              <div>
+                <strong>{{ store.statusLabel(item.status) }}</strong>
+                <p class="muted">{{ store.formatDate(item.at) }}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Hậu mãi khi đơn đang giao (SHIPPING - Right #6) hoặc đã giao (DELIVERED) -->
+        <section class="checkout-step surface" *ngIf="currentOrder.status === 'DELIVERED' || currentOrder.status === 'SHIPPING'">
+          <p class="eyebrow">Hậu mãi ({{ currentOrder.status === 'SHIPPING' ? 'Đang giao hàng' : 'Đã giao hàng' }})</p>
+          
+          <!-- Tab Navigation: Chỉ hiển thị 1 chức năng tại 1 thời điểm -->
+          <div class="pill-nav aftersales-tabs" style="display:flex;gap:0.75rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+            <button
+              type="button"
+              class="pill-nav__link"
+              [class.is-active]="afterSalesTab === 'return'"
+              (click)="afterSalesTab = 'return'"
+              style="cursor:pointer;padding:0.6rem 1.2rem;border-radius:999px;font-weight:600;"
+            >
+              ⇄ 1. Yêu cầu Đổi / Trả hàng (Bắt buộc kèm ảnh)
+            </button>
+            <button
+              type="button"
+              class="pill-nav__link"
+              [class.is-active]="afterSalesTab === 'review'"
+              (click)="afterSalesTab = 'review'"
+              style="cursor:pointer;padding:0.6rem 1.2rem;border-radius:999px;font-weight:600;"
+            >
+              ★ 2. Đánh giá sản phẩm
+            </button>
+          </div>
+
+          <div class="detail-copy">
+            <!-- Form Đổi/Trả (Hỗ trợ cả trạng thái ĐANG GIAO và ĐÃ GIAO - Right #6) -->
+            <form *ngIf="afterSalesTab === 'return'" id="return-form" class="form-grid" (ngSubmit)="onSubmitReturn()">
+              <label class="form-field form-field--full">
+                <span class="form-label">Sản phẩm đổi/trả</span>
+                <select class="form-control" name="productId" [(ngModel)]="returnData.productId">
+                  <option *ngFor="let item of currentOrder.items" [ngValue]="item.productId">
+                    {{ store.getProduct(item.productId)?.name || 'Sản phẩm' }}
+                  </option>
+                </select>
+              </label>
+
+              <label class="form-field form-field--full">
+                <span class="form-label">Loại yêu cầu</span>
+                <select class="form-control" name="type" [(ngModel)]="returnData.type">
+                  <option value="RETURN">Trả hàng</option>
+                  <option value="EXCHANGE">Đổi hàng</option>
+                </select>
+              </label>
+
+              <label class="form-field form-field--full">
+                <span class="form-label">
+                  Import ảnh minh chứng tình trạng (Có thể chọn nhiều ảnh, bắt buộc ít nhất 01 ảnh) <span style="color:#ef4444;font-weight:700;">*</span>
+                </span>
+                <input
+                  class="form-control"
+                  [class.has-error]="returnEvidenceError"
+                  type="file"
+                  name="evidence"
+                  accept="image/*"
+                  multiple
+                  (change)="onEvidenceFilesChange($event)"
+                >
+                <small class="muted" style="display:block;margin-top:0.35rem;font-size:0.8rem;">
+                  Vui lòng chụp rõ các góc móp méo, rách màng bọc, hoặc thiếu phụ kiện. Hệ thống chỉ xử lý yêu cầu có minh chứng ảnh rõ ràng.
+                </small>
+                <small class="field-error" style="color:#f87171;display:block;margin-top:0.35rem;" *ngIf="returnEvidenceError">
+                  ⚠ {{ returnEvidenceError }}
+                </small>
+
+                <!-- Thumbnail gallery of uploaded evidence files -->
+                <div *ngIf="uploadedEvidences.length" style="display:flex;flex-wrap:wrap;gap:0.75rem;margin-top:0.85rem;">
+                  <div
+                    *ngFor="let ev of uploadedEvidences; let idx = index"
+                    style="position:relative;display:flex;flex-direction:column;align-items:center;padding:0.4rem;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(220,180,120,0.3);"
+                  >
+                    <img [src]="ev.url" [alt]="ev.name" style="width:76px;height:76px;object-fit:cover;border-radius:6px;border:1px solid var(--color-gold-soft);">
+                    <span style="font-size:0.7rem;max-width:76px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:0.25rem;">{{ ev.name }}</span>
+                    <button
+                      type="button"
+                      (click)="removeEvidence(idx)"
+                      style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:0.75rem;line-height:1;display:flex;align-items:center;justify-content:center;"
+                      title="Xóa ảnh này"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              </label>
+
+              <label class="form-field form-field--full">
+                <span class="form-label">Lý do đổi/trả <span style="color:#ef4444;font-weight:700;">*</span></span>
+                <textarea class="form-control" name="reason" placeholder="Mô tả chi tiết tình trạng sản phẩm..." required [(ngModel)]="returnData.reason"></textarea>
+              </label>
+
+              <div class="button-row form-field--full">
+                <button class="button button--secondary" type="submit">Gửi yêu cầu đổi/ trả (Kèm {{ uploadedEvidences.length }} ảnh)</button>
+              </div>
+            </form>
+
+            <!-- Form Đánh giá (Chỉ hiển thị khi chọn tab review) -->
+            <form *ngIf="afterSalesTab === 'review'" id="review-form" class="form-grid" (ngSubmit)="onSubmitReview()">
+              <label class="form-field form-field--full">
+                <span class="form-label">Sản phẩm đánh giá</span>
+                <select class="form-control" name="productId" [(ngModel)]="reviewData.productId">
+                  <option *ngFor="let item of currentOrder.items" [ngValue]="item.productId">
+                    {{ store.getProduct(item.productId)?.name || 'Sản phẩm' }}
+                  </option>
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span class="form-label">Điểm sao</span>
+                <select class="form-control" name="rating" [(ngModel)]="reviewData.rating">
+                  <option [ngValue]="5">5 sao</option>
+                  <option [ngValue]="4">4 sao</option>
+                  <option [ngValue]="3">3 sao</option>
+                  <option [ngValue]="2">2 sao</option>
+                  <option [ngValue]="1">1 sao</option>
+                </select>
+              </label>
+
+              <label class="form-field">
+                <span class="form-label">Import ảnh review</span>
+                <input class="form-control" type="file" name="image" accept="image/*" (change)="onReviewFileChange($event)">
+              </label>
+
+              <div class="form-field form-field--full review-suggestions">
+                <span class="form-label">Gợi ý đánh giá nhanh</span>
+                <div class="suggestion-chip-row">
+                  <button
+                    type="button"
+                    *ngFor="let chip of reviewSuggestions"
+                    (click)="applyReviewSuggestion(chip[0])"
+                  >
+                    {{ chip[1] }}
+                  </button>
+                </div>
+              </div>
+
+              <label class="form-field form-field--full">
+                <span class="form-label">Nhận xét</span>
+                <textarea class="form-control" name="comment" required [(ngModel)]="reviewData.comment"></textarea>
+              </label>
+
+              <div class="button-row form-field--full">
+                <button class="button button--primary" type="submit">Gửi đánh giá</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <p class="form-message" [class.form-message--success]="orderSuccess" id="order-message">
+          {{ orderMessage }}
+        </p>
+      </div>
+
+      <aside class="summary-card surface">
+        <p class="eyebrow">Thông tin giao nhận</p>
+        <h2>{{ currentOrder.address.receiverName }}</h2>
+        <p>{{ currentOrder.address.receiverPhone }}</p>
+        <p class="muted">{{ currentOrder.address.detail }}</p>
+        <div class="summary-line"><span>Tạm tính</span><strong>{{ store.formatCurrency(currentOrder.subtotal) }}</strong></div>
+        <div class="summary-line"><span>Giảm giá</span><strong>-{{ store.formatCurrency(currentOrder.discount) }}</strong></div>
+        <div class="summary-line"><span>Phí vận chuyển</span><strong>{{ store.formatCurrency(currentOrder.shippingFee) }}</strong></div>
+        <div class="summary-line summary-line--total"><span>Tổng cộng</span><strong>{{ store.formatCurrency(currentOrder.total) }}</strong></div>
+        <div class="button-row" style="flex-wrap:wrap;gap:0.5rem;">
+          <!-- Right #5: Đơn hàng ở trạng thái Chờ xác nhận (PENDING) -> Bỏ nút Mua lại -->
+          <button
+            *ngIf="currentOrder.status !== 'PENDING'"
+            class="button button--secondary"
+            type="button"
+            (click)="reorder(currentOrder.id)"
+          >
+            Mua lại
+          </button>
+
+          <!-- Right #6: Đơn hàng ĐANG GIAO (SHIPPING) -> Hiện 2 nút: ĐÃ NHẬN HÀNG / TRẢ HÀNG -->
+          <ng-container *ngIf="currentOrder.status === 'SHIPPING'">
+            <button
+              class="button button--primary"
+              style="background:#16a34a;border-color:#16a34a;color:#fff;"
+              type="button"
+              (click)="confirmReceived()"
+            >
+              ✓ Đã nhận hàng
+            </button>
+            <button
+              class="button button--secondary"
+              type="button"
+              (click)="scrollToReturnForm()"
+            >
+              ⇄ Trả hàng / Đổi trả
+            </button>
+          </ng-container>
+
+          <button
+            *ngIf="canRequestCancellation(currentOrder)"
+            class="button button--danger"
+            type="button"
+            (click)="openCancelDialog(currentOrder)"
+          >
+            {{ currentOrder.status === 'PENDING' ? 'Hủy đơn' : 'Yêu cầu hủy' }}
+          </button>
+        </div>
+        <p
+          *ngIf="currentOrder.cancellationRequest as req"
+          class="cancellation-notice"
+          [ngClass]="'cancellation-notice--' + req.status.toLowerCase()"
+        >
+          <strong>{{ cancellationLabel(req.status) }}</strong>
+          <span>{{ req.reason }}</span>
+        </p>
+      </aside>
+    </div>
+
+    <!-- Hộp thoại xác nhận hủy đơn -->
+    <dialog class="confirm-dialog" id="cancel-order-dialog" #cancelDialog>
+      <form method="dialog" id="cancel-order-form" (ngSubmit)="submitCancelOrder()">
+        <p class="eyebrow">Xác nhận thao tác</p>
+        <h2>Hủy đơn hàng?</h2>
+        <p class="muted" id="cancel-order-description">{{ cancelDescription }}</p>
+
+        <label class="form-field">
+          <span class="form-label">Lý do hủy</span>
+          <select class="form-control" name="reasonChoice" required [(ngModel)]="reasonChoice">
+            <option value="">Chọn lý do</option>
+            <option value="Tôi muốn cập nhật địa chỉ hoặc SĐT nhận hàng">Tôi muốn cập nhật địa chỉ hoặc SĐT nhận hàng</option>
+            <option value="Tôi muốn thêm hoặc thay đổi mã giảm giá">Tôi muốn thêm hoặc thay đổi mã giảm giá</option>
+            <option value="Tôi muốn thay đổi sản phẩm hoặc số lượng">Tôi muốn thay đổi sản phẩm hoặc số lượng</option>
+            <option value="Thủ tục thanh toán không thuận tiện">Thủ tục thanh toán không thuận tiện</option>
+            <option value="Tôi tìm thấy nơi mua khác phù hợp hơn">Tôi tìm thấy nơi mua khác phù hợp hơn</option>
+            <option value="Tôi không còn nhu cầu mua nữa">Tôi không còn nhu cầu mua nữa</option>
+            <option value="OTHER">Lý do khác</option>
+          </select>
+        </label>
+
+        <label class="form-field" [class.is-hidden]="reasonChoice !== 'OTHER'" id="cancel-reason-detail">
+          <span class="form-label">Mô tả lý do</span>
+          <textarea
+            class="form-control"
+            name="reasonDetail"
+            minlength="5"
+            maxlength="500"
+            placeholder="Nhập lý do cụ thể"
+            [(ngModel)]="reasonDetail"
+          ></textarea>
+        </label>
+
+        <p class="form-message" id="cancel-order-message">{{ cancelErrorMessage }}</p>
+        <div class="button-row">
+          <button class="button button--ghost" type="button" (click)="closeCancelDialog()">Quay lại</button>
+          <button class="button button--danger" type="submit">Xác nhận hủy</button>
+        </div>
+      </form>
+    </dialog>
+  </section>
+</ng-container>
+
+<ng-template #notFound>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Không tìm thấy đơn hàng</h3>
+          <p class="muted">Đơn hàng không tồn tại hoặc không thuộc tài khoản này.</p>
+          <a class="button button--primary" routerLink="/orders">Về danh sách đơn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

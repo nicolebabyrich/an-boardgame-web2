@@ -1,0 +1,186 @@
+<ng-container *ngIf="user; else loginPrompt">
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Tài khoản</p>
+      <h1>Đơn hàng của tôi</h1>
+      <p class="muted">Theo dõi hành trình từ khi hồ sơ được tiếp nhận đến lúc giao thành công.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <!-- Thanh lọc trạng thái đơn hàng dàn hàng ngang kiểu Shopee (Right #4) -->
+      <nav
+        class="surface"
+        aria-label="Lọc trạng thái đơn hàng"
+        style="display:flex;overflow-x:auto;border-bottom:2px solid rgba(213,183,107,0.2);margin-bottom:1.5rem;padding:0.25rem;"
+      >
+        <button
+          *ngFor="let tab of statusTabs"
+          type="button"
+          (click)="statusFilter = tab.key"
+          [style.borderBottom]="statusFilter === tab.key ? '3px solid #d5b76b' : '3px solid transparent'"
+          [style.color]="statusFilter === tab.key ? '#d5b76b' : 'inherit'"
+          [style.fontWeight]="statusFilter === tab.key ? '700' : '500'"
+          style="flex:1;min-width:130px;padding:0.85rem 0.75rem;background:transparent;border-top:none;border-left:none;border-right:none;cursor:pointer;text-align:center;white-space:nowrap;transition:all 0.2s;"
+        >
+          {{ tab.label }} ({{ getCountByStatus(tab.key) }})
+        </button>
+      </nav>
+
+      <div class="order-list" *ngIf="orders.length; else emptyOrders">
+        <article class="order-card surface" *ngFor="let order of orders">
+          <div class="order-card__header">
+            <div>
+              <p class="eyebrow">{{ store.formatDate(order.createdAt) }}</p>
+              <h3>{{ order.code }}</h3>
+            </div>
+            <span class="status-badge" [ngClass]="store.statusBadgeModifier(order.status)">
+              {{ store.statusLabel(order.status) }}
+            </span>
+          </div>
+
+          <div class="summary-line">
+            <span>{{ order.items.length }} dòng sản phẩm</span>
+            <strong>{{ store.formatCurrency(order.total) }}</strong>
+          </div>
+
+          <div class="order-preview-list">
+            <div class="order-preview" *ngFor="let item of order.items.slice(0, 3)">
+              <img [src]="store.getProduct(item.productId)?.images?.[0] || '/img/products/18.png'" alt="">
+              <span>
+                <strong>{{ store.getProduct(item.productId)?.name || 'Sản phẩm' }}</strong>
+                <small>Số lượng: {{ item.quantity }}{{ item.attribute ? ' · ' + item.attribute : '' }}</small>
+              </span>
+            </div>
+          </div>
+
+          <p
+            *ngIf="order.cancellationRequest as req"
+            class="cancellation-notice"
+            [ngClass]="'cancellation-notice--' + req.status.toLowerCase()"
+          >
+            <strong>{{ cancellationLabel(req.status) }}</strong>
+            <span>{{ req.reason }}</span>
+          </p>
+
+          <div class="button-row" style="flex-wrap:wrap;gap:0.5rem;">
+            <a class="button button--primary button--small" [routerLink]="['/orders', order.id]">Xem chi tiết</a>
+
+            <!-- Right #5: Đơn hàng ở trạng thái Chờ xác nhận (PENDING) -> BỎ nút Mua lại -->
+            <button
+              *ngIf="order.status !== 'PENDING'"
+              class="button button--ghost button--small"
+              type="button"
+              (click)="reorder(order.id)"
+            >
+              Mua lại
+            </button>
+
+            <!-- Right #6: Đơn hàng ở trạng thái ĐANG GIAO (SHIPPING) -> Hiện 2 nút: ĐÃ NHẬN HÀNG / TRẢ HÀNG (như Shopee) -->
+            <ng-container *ngIf="order.status === 'SHIPPING'">
+              <button
+                class="button button--primary button--small"
+                style="background:#16a34a;border-color:#16a34a;color:#fff;"
+                type="button"
+                (click)="confirmReceived(order.id)"
+              >
+                ✓ Đã nhận hàng
+              </button>
+              <button
+                class="button button--secondary button--small"
+                type="button"
+                (click)="goToReturnRequest(order.id)"
+              >
+                ⇄ Trả hàng / Hoàn tiền
+              </button>
+            </ng-container>
+
+            <button
+              *ngIf="canRequestCancellation(order)"
+              class="button button--danger button--small"
+              type="button"
+              (click)="openCancelDialog(order)"
+            >
+              {{ order.status === 'PENDING' ? 'Hủy đơn' : 'Yêu cầu hủy' }}
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #emptyOrders>
+        <div class="empty-state">
+          <div>
+            <div class="empty-state__symbol" aria-hidden="true">◇</div>
+            <h3>Không có đơn hàng ở trạng thái này</h3>
+            <p class="muted">Hãy chọn thẻ trạng thái khác hoặc khám phá thêm sản phẩm mới.</p>
+            <div class="button-row" style="justify-content:center;">
+              <button *ngIf="statusFilter !== 'ALL'" class="button button--secondary" type="button" (click)="statusFilter = 'ALL'">Xem tất cả đơn</button>
+              <a class="button button--primary" routerLink="/products">Khám phá sản phẩm</a>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <p class="form-message" [class.form-message--success]="orderSuccess" id="order-message">
+        {{ orderMessage }}
+      </p>
+
+      <!-- Hộp thoại xác nhận hủy đơn -->
+      <dialog class="confirm-dialog" id="cancel-order-dialog" #cancelDialog>
+        <form method="dialog" id="cancel-order-form" (ngSubmit)="submitCancelOrder()">
+          <p class="eyebrow">Xác nhận thao tác</p>
+          <h2>Hủy đơn hàng?</h2>
+          <p class="muted" id="cancel-order-description">{{ cancelDescription }}</p>
+
+          <label class="form-field">
+            <span class="form-label">Lý do hủy</span>
+            <select class="form-control" name="reasonChoice" required [(ngModel)]="reasonChoice">
+              <option value="">Chọn lý do</option>
+              <option value="Tôi muốn cập nhật địa chỉ hoặc SĐT nhận hàng">Tôi muốn cập nhật địa chỉ hoặc SĐT nhận hàng</option>
+              <option value="Tôi muốn thêm hoặc thay đổi mã giảm giá">Tôi muốn thêm hoặc thay đổi mã giảm giá</option>
+              <option value="Tôi muốn thay đổi sản phẩm hoặc số lượng">Tôi muốn thay đổi sản phẩm hoặc số lượng</option>
+              <option value="Thủ tục thanh toán không thuận tiện">Thủ tục thanh toán không thuận tiện</option>
+              <option value="Tôi tìm thấy nơi mua khác phù hợp hơn">Tôi tìm thấy nơi mua khác phù hợp hơn</option>
+              <option value="Tôi không còn nhu cầu mua nữa">Tôi không còn nhu cầu mua nữa</option>
+              <option value="OTHER">Lý do khác</option>
+            </select>
+          </label>
+
+          <label class="form-field" [class.is-hidden]="reasonChoice !== 'OTHER'" id="cancel-reason-detail">
+            <span class="form-label">Mô tả lý do</span>
+            <textarea
+              class="form-control"
+              name="reasonDetail"
+              minlength="5"
+              maxlength="500"
+              placeholder="Nhập lý do cụ thể"
+              [(ngModel)]="reasonDetail"
+            ></textarea>
+          </label>
+
+          <p class="form-message" id="cancel-order-message">{{ cancelErrorMessage }}</p>
+          <div class="button-row">
+            <button class="button button--ghost" type="button" (click)="closeCancelDialog()">Quay lại</button>
+            <button class="button button--danger" type="submit">Xác nhận hủy</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+  </section>
+</ng-container>
+
+<ng-template #loginPrompt>
+  <section class="section">
+    <div class="container">
+      <div class="empty-state">
+        <div>
+          <div class="empty-state__symbol" aria-hidden="true">◇</div>
+          <h3>Cần đăng nhập</h3>
+          <p class="muted">Đăng nhập để xem danh sách đơn hàng của bạn.</p>
+          <a class="button button--primary" routerLink="/login">Đăng nhập</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</ng-template>

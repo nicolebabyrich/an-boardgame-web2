@@ -1,0 +1,37 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faea7e",
+    "id": "all",
+    "name": "Tất cả sản phẩm",
+    "description": "Toàn bộ hồ sơ và vật phẩm đang được lưu trữ.",
+    "hidden": false
+  },
+  {
+    "_id": "6af08eb59a1f530416faea7f",
+    "id": "boardgame",
+    "name": "BoardGame",
+    "description": "Những vụ án lịch sử được kể bằng suy luận và nhập vai.",
+    "hidden": false
+  },
+  {
+    "_id": "6af08eb59a1f530416faea80",
+    "id": "combo",
+    "name": "Combo",
+    "description": "Bộ sưu tập trọn vẹn cho từng cấp bậc điều tra viên.",
+    "hidden": false
+  },
+  {
+    "_id": "6af08eb59a1f530416faea81",
+    "id": "merchandise",
+    "name": "Merchandise",
+    "description": "Vật phẩm mang dấu ấn của thế giới ẨN.",
+    "hidden": false
+  },
+  {
+    "_id": "6af08eb59a1f530416faea82",
+    "id": "accessory",
+    "name": "Phụ kiện",
+    "description": "Công cụ hỗ trợ mỗi cuộc phá án trên bàn chơi.",
+    "hidden": false
+  }
+]

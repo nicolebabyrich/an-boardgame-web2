@@ -1,0 +1,218 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faeaa4",
+    "id": 1,
+    "code": "AN202606280001",
+    "userId": 1,
+    "status": "PENDING",
+    "paymentStatus": "PENDING",
+    "paymentMethod": "COD",
+    "createdAt": "28.06.2026",
+    "subtotal": 329000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 329000,
+    "voucherCode": null,
+    "stockDeducted": false,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 329000
+      }
+    ],
+    "timeline": [
+      {
+        "status": "PENDING",
+        "at": "28.06.2026"
+      }
+    ],
+    "cancellationRequest": null
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa5",
+    "id": 2,
+    "code": "AN202606270002",
+    "userId": 1,
+    "status": "CONFIRMED",
+    "paymentStatus": "SUCCESS",
+    "paymentMethod": "MOCK_CARD",
+    "createdAt": "27.06.2026",
+    "subtotal": 389000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 389000,
+    "voucherCode": null,
+    "stockDeducted": true,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 2,
+        "quantity": 1,
+        "unitPrice": 389000
+      }
+    ],
+    "timeline": [
+      {
+        "status": "CONFIRMED",
+        "at": "27.06.2026"
+      }
+    ],
+    "cancellationRequest": null
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa6",
+    "id": 3,
+    "code": "AN202606260003",
+    "userId": 1,
+    "status": "DELIVERED",
+    "paymentStatus": "SUCCESS",
+    "paymentMethod": "MOCK_CARD",
+    "createdAt": "26.06.2026",
+    "subtotal": 699000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 699000,
+    "voucherCode": null,
+    "stockDeducted": true,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 3,
+        "quantity": 1,
+        "unitPrice": 699000
+      }
+    ],
+    "timeline": [
+      {
+        "status": "SHIPPING",
+        "at": "26.06.2026"
+      },
+      {
+        "status": "DELIVERED",
+        "at": "9/11/2026"
+      }
+    ],
+    "cancellationRequest": null
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa7",
+    "id": 4,
+    "code": "AN202606200004",
+    "userId": 1,
+    "status": "DELIVERED",
+    "paymentStatus": "SUCCESS",
+    "paymentMethod": "MOCK_CARD",
+    "createdAt": "20.06.2026",
+    "subtotal": 329000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 329000,
+    "voucherCode": null,
+    "stockDeducted": true,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 329000
+      }
+    ],
+    "timeline": [
+      {
+        "status": "DELIVERED",
+        "at": "20.06.2026"
+      }
+    ],
+    "cancellationRequest": null
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa8",
+    "id": 5,
+    "code": "AN202606180005",
+    "userId": 1,
+    "status": "CANCELLED",
+    "paymentStatus": "REFUNDED",
+    "paymentMethod": "MOCK_CARD",
+    "createdAt": "18.06.2026",
+    "subtotal": 199000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 199000,
+    "voucherCode": null,
+    "stockDeducted": true,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 5,
+        "quantity": 1,
+        "unitPrice": 199000
+      }
+    ],
+    "timeline": [
+      {
+        "status": "CANCELLED",
+        "at": "18.06.2026"
+      }
+    ],
+    "cancellationRequest": null
+  },
+  {
+    "_id": "6af0a83fc20e9f187bb596b0",
+    "id": 6,
+    "code": "AN2026110807058",
+    "userId": 1,
+    "status": "PENDING",
+    "paymentStatus": "PENDING",
+    "paymentMethod": "COD",
+    "createdAt": "8/11/2026",
+    "reservedUntil": "2026-11-08T17:05:07.080Z",
+    "subtotal": 329000,
+    "discount": 0,
+    "shippingFee": 0,
+    "total": 329000,
+    "voucherCode": "FREESHIP",
+    "stockDeducted": false,
+    "address": {
+      "receiverName": "Hoàng Lan",
+      "receiverPhone": "0704477397",
+      "detail": "18 đường Trần Quốc Thảo, Phường Võ Thị Sáu, Quận 3, Thành phố Hồ Chí Minh"
+    },
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 1,
+        "unitPrice": 329000,
+        "attribute": "Bản Tiêu Chuẩn"
+      }
+    ],
+    "timeline": [
+      {
+        "status": "PENDING",
+        "at": "8/11/2026"
+      }
+    ],
+    "cancellationRequest": null
+  }
+]

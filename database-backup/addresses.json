@@ -1,0 +1,41 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faeaa1",
+    "id": 1,
+    "userId": 1,
+    "receiverName": "Hoàng Lan",
+    "receiverPhone": "0704477397",
+    "province": "Thành phố Hồ Chí Minh",
+    "district": "Quận 3",
+    "ward": "Phường Võ Thị Sáu",
+    "detailAddress": "18 đường Trần Quốc Thảo",
+    "label": "Nhà riêng",
+    "isDefault": true
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa2",
+    "id": 2,
+    "userId": 1,
+    "receiverName": "Hoàng Lan",
+    "receiverPhone": "0704477397",
+    "province": "Thành phố Hồ Chí Minh",
+    "district": "Quận 1",
+    "ward": "Phường Bến Nghé",
+    "detailAddress": "88 đường Nguyễn Huệ",
+    "label": "Công ty",
+    "isDefault": false
+  },
+  {
+    "_id": "6af08eb59a1f530416faeaa3",
+    "id": 3,
+    "userId": 2,
+    "receiverName": "Lê Ngọc Mai",
+    "receiverPhone": "0901000002",
+    "province": "Thành phố Hà Nội",
+    "district": "Quận Hoàn Kiếm",
+    "ward": "Phường Hàng Bạc",
+    "detailAddress": "25 phố Hàng Bạc",
+    "label": "Nhà riêng",
+    "isDefault": true
+  }
+]

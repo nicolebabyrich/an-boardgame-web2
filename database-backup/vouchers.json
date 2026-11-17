@@ -1,0 +1,79 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faea93",
+    "code": "AN10",
+    "name": "Mật mã nhập môn",
+    "type": "percentage",
+    "value": 10,
+    "maxDiscount": 150000,
+    "minOrder": 500000,
+    "startAt": "2026-06-01T00:00:00+07:00",
+    "endAt": "2026-12-31T23:59:59+07:00",
+    "usageLimit": 200,
+    "usedCount": 18,
+    "usedByUserIds": [],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea94",
+    "code": "LECHI150",
+    "name": "Hồ sơ Lệ Chi",
+    "type": "fixed",
+    "value": 150000,
+    "maxDiscount": null,
+    "minOrder": 1000000,
+    "startAt": "2026-06-01T00:00:00+07:00",
+    "endAt": "2026-12-31T23:59:59+07:00",
+    "usageLimit": 100,
+    "usedCount": 24,
+    "usedByUserIds": [],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea95",
+    "code": "HETBIAN",
+    "name": "Hồ sơ đã niêm phong",
+    "type": "fixed",
+    "value": 50000,
+    "maxDiscount": null,
+    "minOrder": 300000,
+    "startAt": "2026-01-01T00:00:00+07:00",
+    "endAt": "2026-05-31T23:59:59+07:00",
+    "usageLimit": 20,
+    "usedCount": 20,
+    "usedByUserIds": [],
+    "status": "EXPIRED"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea96",
+    "code": "FREESHIP",
+    "name": "Mật lệnh giao nhận",
+    "type": "shipping",
+    "value": 30000,
+    "maxDiscount": 30000,
+    "minOrder": 300000,
+    "startAt": "2026-06-01T00:00:00+07:00",
+    "endAt": "2026-12-31T23:59:59+07:00",
+    "usageLimit": 150,
+    "usedCount": 13,
+    "usedByUserIds": [
+      1
+    ],
+    "status": "ACTIVE"
+  },
+  {
+    "_id": "6af08eb59a1f530416faea97",
+    "code": "THAMTU50",
+    "name": "Ưu đãi điều tra viên",
+    "type": "fixed",
+    "value": 50000,
+    "maxDiscount": null,
+    "minOrder": 400000,
+    "startAt": "2026-07-01T00:00:00+07:00",
+    "endAt": "2026-12-31T23:59:59+07:00",
+    "usageLimit": 100,
+    "usedCount": 5,
+    "usedByUserIds": [],
+    "status": "ACTIVE"
+  }
+]

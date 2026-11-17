@@ -1,0 +1,21 @@
+[
+  {
+    "_id": "6af08eb59a1f530416faeabb",
+    "id": 1,
+    "code": "RT20260629",
+    "orderId": 4,
+    "userId": 1,
+    "productId": 1,
+    "type": "EXCHANGE",
+    "quantity": 1,
+    "reason": "Một góc hộp hơi móp nhẹ khi vận chuyển, mong shop hỗ trợ kiểm tra.",
+    "evidenceName": "15.png",
+    "status": "PENDING",
+    "adminNote": "",
+    "createdAt": "29.06.2026",
+    "evidenceImage": "/img/products/15.png",
+    "evidenceImages": [
+      "/img/products/15.png"
+    ]
+  }
+]

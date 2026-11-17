@@ -1,0 +1,83 @@
+[
+  {
+    "_id": "6af09d26db760229033c44bf",
+    "id": 1,
+    "ticketCode": "TV-20260629-01",
+    "customerName": "Hoàng Lan",
+    "customerPhone": "0704477397",
+    "emotionLevel": "RED",
+    "emotionColor": "#ef4444",
+    "emotionLabel": "Đỏ — Khách hàng đang bức xúc cao",
+    "originalMessage": "dmm giao hàng kiểu gì mà hộp móp góc, nhắn mãi không ai trả lời, quá tệ!",
+    "softenedMessage": "Tôi đang rất bức xúc vì hộp sản phẩm bị móp góc khi giao nhận và cần Tư vấn viên kiểm tra, đổi mới gấp giúp tôi.",
+    "status": "PENDING",
+    "advisorReply": "",
+    "createdAt": "29/06/2026 21:15",
+    "messages": [
+      {
+        "role": "user",
+        "text": "dmm giao hàng kiểu gì mà hộp móp góc, nhắn mãi không ai trả lời, quá tệ!",
+        "at": "21:15"
+      },
+      {
+        "role": "bot",
+        "text": "Thư Đồng thành thật xin lỗi bạn! Hệ thống đã chuyển ngữ lịch sự và báo động mức ĐỎ cho Tư vấn viên hỗ trợ khẩn cấp.",
+        "at": "21:15"
+      }
+    ]
+  },
+  {
+    "_id": "6af09d26db760229033c44c0",
+    "id": 2,
+    "ticketCode": "TV-20260629-02",
+    "customerName": "Phạm Gia Huy",
+    "customerPhone": "0901000003",
+    "emotionLevel": "ORANGE",
+    "emotionColor": "#f59e0b",
+    "emotionLabel": "Cam — Khách hàng sốt ruột / Khiếu nại",
+    "originalMessage": "Đơn hàng AN202606260003 sao lâu quá chưa giao tới nữa shop ơi, chờ mãi!",
+    "softenedMessage": "Nhờ Tư vấn viên kiểm tra giúp tôi hành trình đơn hàng AN202606260003 vì thời gian giao hơi chậm so với dự kiến.",
+    "status": "PENDING",
+    "advisorReply": "",
+    "createdAt": "29/06/2026 19:40",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Đơn hàng AN202606260003 sao lâu quá chưa giao tới nữa shop ơi, chờ mãi!",
+        "at": "19:40"
+      },
+      {
+        "role": "bot",
+        "text": "Thư Đồng hiểu bạn đang sốt ruột. Đã chuyển thông tin sang bộ phận Tư vấn viên kiểm tra bưu cục ngay ạ.",
+        "at": "19:40"
+      }
+    ]
+  },
+  {
+    "_id": "6af09d26db760229033c44c1",
+    "id": 3,
+    "ticketCode": "TV-20260628-03",
+    "customerName": "Lê Ngọc Mai",
+    "customerPhone": "0901000002",
+    "emotionLevel": "GREEN",
+    "emotionColor": "#22c55e",
+    "emotionLabel": "Xanh — Khách hàng bình tĩnh",
+    "originalMessage": "Shop tư vấn giúp mình gói Combo Thiên Tử gói quà sinh nhật có kèm thiệp cổ phong không ạ?",
+    "softenedMessage": "Khách hàng nhờ tư vấn gói quà sinh nhật Combo Thiên Tử kèm thiệp cổ phong.",
+    "status": "RESOLVED",
+    "advisorReply": "Chào bạn Ngọc Mai, ẨN Store có hỗ trợ gói giấy dó và tặng kèm thiệp dấu sáp miễn phí cho Combo Thiên Tử nhé ạ!",
+    "createdAt": "28/06/2026 16:20",
+    "messages": [
+      {
+        "role": "user",
+        "text": "Shop tư vấn giúp mình gói Combo Thiên Tử gói quà sinh nhật có kèm thiệp cổ phong không ạ?",
+        "at": "16:20"
+      },
+      {
+        "role": "advisor",
+        "text": "Chào bạn Ngọc Mai, ẨN Store có hỗ trợ gói giấy dó và tặng kèm thiệp dấu sáp miễn phí cho Combo Thiên Tử nhé ạ!",
+        "at": "16:24"
+      }
+    ]
+  }
+]

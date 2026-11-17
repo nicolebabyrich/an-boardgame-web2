@@ -1,0 +1,36 @@
+/* Tinh chỉnh Chatbot form nhập liệu gọn đẹp, không bị cuộn hay rớt chữ placeholder */
+.chatbot-form {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 0.65rem !important;
+  align-items: stretch !important;
+}
+
+.chatbot-form textarea {
+  min-height: 3.2rem !important;
+  max-height: 6rem !important;
+  padding: 0.65rem 0.85rem !important;
+  font-size: 0.88rem !important;
+  line-height: 1.45 !important;
+  resize: none !important;
+  border-radius: 8px !important;
+  background: rgba(14, 4, 4, 0.6) !important;
+  border: 1px solid rgba(213, 183, 107, 0.35) !important;
+  color: #fff4da !important;
+  overflow-y: auto !important;
+}
+
+.chatbot-form textarea::placeholder {
+  color: rgba(243, 234, 214, 0.55) !important;
+}
+
+.chatbot-form button {
+  min-height: 3.2rem !important;
+  padding: 0 1.25rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}

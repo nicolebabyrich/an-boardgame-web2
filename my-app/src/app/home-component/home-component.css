@@ -1,0 +1,306 @@
+/* Kiểu trình bày chỉ áp dụng cho trang chủ. */
+.hero {
+  isolation: isolate;
+}
+
+/* ==================== MÔ PHỎNG CĂN PHÒNG HIỆN TRƯỜNG LỆ CHI VIÊN (POINT & CLICK + VN POPUP) ==================== */
+.crime-room-shell {
+  border: 1px solid rgba(213, 183, 107, 0.42);
+  border-radius: 18px;
+  background: #140807;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.crime-room-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: linear-gradient(180deg, rgba(42, 16, 14, 0.96), rgba(24, 9, 8, 0.96));
+  border-bottom: 1px solid rgba(213, 183, 107, 0.25);
+}
+
+.crime-room-stage {
+  position: relative;
+  min-height: 590px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background:
+    radial-gradient(circle at 20% 48%, rgba(235, 168, 68, 0.22) 0%, transparent 26%),
+    radial-gradient(circle at 50% 56%, rgba(217, 88, 54, 0.24) 0%, transparent 28%),
+    radial-gradient(circle at 80% 42%, rgba(213, 183, 107, 0.2) 0%, transparent 26%),
+    linear-gradient(180deg, rgba(16, 6, 6, 0.55) 0%, rgba(16, 6, 6, 0.35) 48%, rgba(14, 5, 5, 0.92) 100%),
+    url('/img/backgrounds/background.png') center 42% / cover no-repeat;
+  overflow: hidden;
+  padding: 1.15rem 1.35rem 1.35rem;
+}
+
+/* Khung xà gỗ & ánh nến cổ phong trong phòng */
+.crime-room-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.82);
+  pointer-events: none;
+}
+
+.room-hud-bar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 12px;
+  background: rgba(18, 7, 7, 0.82);
+  border: 1px solid rgba(213, 183, 107, 0.32);
+  backdrop-filter: blur(6px);
+}
+
+.room-canvas-area {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-height: 295px;
+  width: 100%;
+}
+
+/* Điểm sáng vật chứng & Nhân vật mini pop-up trong phòng (Màn 1) */
+.room-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  z-index: 3;
+  transition: transform 0.22s ease, z-index 0.2s;
+}
+
+.room-node:hover,
+.room-node.is-active {
+  z-index: 6;
+  transform: translate(-50%, -54%) scale(1.04);
+}
+
+/* Bong bóng thoại mini trên đầu nhân vật trong phòng */
+.room-speech-bubble {
+  max-width: 225px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(252, 243, 224, 0.96);
+  color: #230d0b;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.38;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55);
+  border: 1.5px solid #d5b76b;
+  margin-bottom: 0.5rem;
+  position: relative;
+  text-align: center;
+  animation: roomBubbleFloat 2.6s ease-in-out infinite;
+}
+
+.room-speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 7px 7px 0;
+  border-style: solid;
+  border-color: rgba(252, 243, 224, 0.96) transparent transparent;
+}
+
+/* Nhân vật mini-size pop-up tại từng vị trí trong phòng */
+.room-mini-character {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.65rem 0.3rem 0.3rem;
+  border-radius: 999px;
+  background: rgba(28, 10, 9, 0.92);
+  border: 1.5px solid rgba(213, 183, 107, 0.65);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+  margin-bottom: 0.4rem;
+  animation: roomPopUp 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+.room-mini-character img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--color-gold-soft);
+  background: #2b110f;
+}
+
+.room-mini-character__meta {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.room-mini-character__meta strong {
+  font-size: 0.76rem;
+  color: var(--color-gold-soft);
+  line-height: 1.15;
+}
+
+.room-mini-character__meta small {
+  font-size: 0.66rem;
+  color: rgba(243, 234, 214, 0.78);
+}
+
+/* Nút điểm sáng vật chứng tại căn phòng */
+.room-hotspot-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(24, 9, 8, 0.9);
+  border: 1.5px solid rgba(213, 183, 107, 0.75);
+  color: #f3ead6;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 0 0 5px rgba(213, 183, 107, 0.16), 0 8px 20px rgba(0, 0, 0, 0.55);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.room-node.is-active .room-hotspot-btn {
+  background: var(--color-gold);
+  color: #1c080a;
+  box-shadow: 0 0 0 8px rgba(213, 183, 107, 0.28), 0 10px 26px rgba(0, 0, 0, 0.65);
+}
+
+.room-hotspot-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #89b96f;
+  display: inline-block;
+}
+
+/* Nhân vật nghi phạm đứng trong phòng ở Màn 2 */
+.room-suspect-figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+  border-radius: 16px;
+  background: rgba(24, 9, 8, 0.88);
+  border: 1.5px solid rgba(213, 183, 107, 0.45);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.room-node.is-active .room-suspect-figure {
+  border-color: var(--color-gold-soft);
+  background: rgba(56, 20, 16, 0.95);
+  box-shadow: 0 0 0 6px rgba(213, 183, 107, 0.22), 0 14px 32px rgba(0, 0, 0, 0.75);
+}
+
+.room-suspect-figure img {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-gold-soft);
+  margin-bottom: 0.35rem;
+}
+
+/* Hộp thoại Visual Novel / Pop-up tương tác dưới đáy căn phòng */
+.room-vn-box {
+  position: relative;
+  z-index: 4;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(28, 10, 9, 0.96), rgba(16, 6, 6, 0.98));
+  border: 1.5px solid rgba(213, 183, 107, 0.55);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75);
+  padding: 1.15rem 1.35rem;
+  animation: roomPopUp 0.26s ease-out;
+}
+
+.room-vn-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.1rem;
+  align-items: center;
+}
+
+.room-vn-portrait {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 112px;
+}
+
+.room-vn-portrait img {
+  width: 82px;
+  height: 82px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2.5px solid var(--color-gold-soft);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.65);
+  background: #2b110f;
+}
+
+.room-vn-portrait__badge {
+  margin-top: -8px;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-gold);
+  color: #1c080a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@keyframes roomPopUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes roomBubbleFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 860px) {
+  .room-canvas-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    min-height: auto;
+  }
+
+  .room-node {
+    position: static;
+    transform: none !important;
+  }
+
+  .room-vn-grid {
+    grid-template-columns: 1fr;
+  }
+}
